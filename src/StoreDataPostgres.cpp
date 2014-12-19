@@ -4,156 +4,183 @@
  * 
  * Created on 2014年12月13日, 下午10:18
  */
+
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
+#include <arpa/inet.h>
 #include "cmhead.h"
+
 #include "StoreDataPostgres.h"
 
 StoreDataPostgres::StoreDataPostgres() {
 
-  int tlen = 64;
-  configFile = (char*) malloc(LINE * sizeof (char));
-  sprintf(configFile, "%s", "");
+    int tlen = 255;
+    configFile = (char*) malloc(LINE * sizeof (char));
+    sprintf(configFile, "%s", "");
 
-  host = (char*) malloc(tlen * sizeof (char));
-  sprintf(host, "%s", "");
+    host = (char*) malloc(tlen * sizeof (char));
+    sprintf(host, "%s", "");
 
-  port = (char*) malloc(tlen * sizeof (char));
-  sprintf(port, "%s", "");
+    port = (char*) malloc(tlen * sizeof (char));
+    sprintf(port, "%s", "");
 
-  dbname = (char*) malloc(tlen * sizeof (char));
-  sprintf(dbname, "%s", "");
+    dbname = (char*) malloc(tlen * sizeof (char));
+    sprintf(dbname, "%s", "");
 
-  user = (char*) malloc(tlen * sizeof (char));
-  sprintf(user, "%s", "");
+    user = (char*) malloc(tlen * sizeof (char));
+    sprintf(user, "%s", "");
 
-  password = (char*) malloc(tlen * sizeof (char));
-  sprintf(password, "%s", "");
+    password = (char*) malloc(tlen * sizeof (char));
+    sprintf(password, "%s", "");
 
-  options = (char*) malloc(tlen * sizeof (char));
-  sprintf(options, "%s", "");
+    options = (char*) malloc(tlen * sizeof (char));
+    sprintf(options, "%s", "");
 
-  tty = (char*) malloc(tlen * sizeof (char));
-  sprintf(tty, "%s", "");
+    tty = (char*) malloc(tlen * sizeof (char));
+    sprintf(tty, "%s", "");
 
-  catfile_table = (char*) malloc(tlen * sizeof (char));
-  sprintf(catfile_table, "%s", "");
+    catfile_table = (char*) malloc(tlen * sizeof (char));
+    sprintf(catfile_table, "%s", "");
 
-  match_table = (char*) malloc(tlen * sizeof (char));
-  sprintf(match_table, "%s", "");
+    match_table = (char*) malloc(tlen * sizeof (char));
+    sprintf(match_table, "%s", "");
 
-  ot_table = (char*) malloc(tlen * sizeof (char));
-  sprintf(ot_table, "%s", "");
+    ot_table = (char*) malloc(tlen * sizeof (char));
+    sprintf(ot_table, "%s", "");
 
-  ot_flux_table = (char*) malloc(tlen * sizeof (char));
-  sprintf(ot_flux_table, "%s", "");
+    ot_flux_table = (char*) malloc(tlen * sizeof (char));
+    sprintf(ot_flux_table, "%s", "");
+
+    catid = 0;
 }
 
 StoreDataPostgres::StoreDataPostgres(const StoreDataPostgres& orig) {
 }
 
 StoreDataPostgres::~StoreDataPostgres() {
+    PQfinish(conn);
 }
 
 void StoreDataPostgres::store(StarFile *starFile) {
 
 }
 
+void StoreDataPostgres::store(StarFileFits *starFile, int fileType) {
+
+    conn = PQsetdbLogin(host, port, options, tty, dbname, user, password);
+    if (PQstatus(conn) == CONNECTION_BAD) {
+        fprintf(stderr, "connect db failed! %s\n", PQerrorMessage(conn));
+        PQfinish(conn);
+        return;
+    }
+
+    storeCatfileInfo(starFile, fileType);
+    storeCatlog(starFile, fileType);
+    if (!fileType) {
+        storeOT(starFile);
+        storeOTFlux(starFile);
+    }
+
+    PQfinish(conn);
+}
+
 void StoreDataPostgres::readDbInfo(char *configFile) {
 
-  FILE *fp = NULL;
-  char *line = NULL;
-  if (configFile == NULL || strlen(configFile) == 0) {
-    printf("database config file name is empty!\n");
-    return;
-  }
-
-  if ((fp = fopen(configFile, "r")) == NULL) {
-    printf("open file %s error!\n", configFile);
-    return;
-  }
-
-  //initDbInfo();
-
-  char *delim = "=";
-  char *tmpStr = NULL;
-  char *buf = (char*) malloc(LINE * sizeof (char));
-  while (line = fgets(buf, LINE, fp)) {
-
-    trim(line);
-    if ((*line == '\n') || (strlen(line) == 0)) continue;
-
-    tmpStr = strtok(line, delim);
-    if ((tmpStr == NULL) || (strlen(tmpStr) == 0)) continue;
-    if (strcmp(tmpStr, "host") == 0) {
-      tmpStr = strtok(NULL, delim);
-      if (tmpStr != NULL)
-        strcpy(host, tmpStr);
-      else
-        strcpy(host, "");
-    } else if (strcmp(tmpStr, "port") == 0) {
-      tmpStr = strtok(NULL, delim);
-      if (tmpStr != NULL)
-        strcpy(port, tmpStr);
-      else
-        strcpy(port, "");
-    } else if (strcmp(tmpStr, "dbname") == 0) {
-      tmpStr = strtok(NULL, delim);
-      if (tmpStr != NULL)
-        strcpy(dbname, tmpStr);
-      else
-        strcpy(dbname, "");
-    } else if (strcmp(tmpStr, "user") == 0) {
-      tmpStr = strtok(NULL, delim);
-      if (tmpStr != NULL)
-        strcpy(user, tmpStr);
-      else
-        strcpy(user, "");
-    } else if (strcmp(tmpStr, "password") == 0) {
-      tmpStr = strtok(NULL, delim);
-      if (tmpStr != NULL)
-        strcpy(password, tmpStr);
-      else
-        strcpy(password, "");
-    } else if (strcmp(tmpStr, "options") == 0) {
-      tmpStr = strtok(NULL, delim);
-      if (tmpStr != NULL)
-        strcpy(options, tmpStr);
-      else
-        strcpy(options, "");
-    } else if (strcmp(tmpStr, "tty") == 0) {
-      tmpStr = strtok(NULL, delim);
-      if (tmpStr != NULL)
-        strcpy(tty, tmpStr);
-      else
-        strcpy(tty, "");
-    } else if (strcmp(tmpStr, "catfile_table") == 0) {
-      tmpStr = strtok(NULL, delim);
-      if (tmpStr != NULL)
-        strcpy(catfile_table, tmpStr);
-      else
-        strcpy(catfile_table, "");
-    } else if (strcmp(tmpStr, "match_table") == 0) {
-      tmpStr = strtok(NULL, delim);
-      if (tmpStr != NULL)
-        strcpy(match_table, tmpStr);
-      else
-        strcpy(match_table, "");
-    } else if (strcmp(tmpStr, "ot_table") == 0) {
-      tmpStr = strtok(NULL, delim);
-      if (tmpStr != NULL)
-        strcpy(ot_table, tmpStr);
-      else
-        strcpy(ot_table, "");
-    } else if (strcmp(tmpStr, "ot_flux_table") == 0) {
-      tmpStr = strtok(NULL, delim);
-      if (tmpStr != NULL)
-        strcpy(ot_flux_table, tmpStr);
-      else
-        strcpy(ot_flux_table, "");
+    FILE *fp = NULL;
+    char *line = NULL;
+    if (configFile == NULL || strlen(configFile) == 0) {
+        printf("database config file name is empty!\n");
+        return;
     }
-  }
-  free(buf);
-  fclose(fp);
+
+    if ((fp = fopen(configFile, "r")) == NULL) {
+        printf("open file %s error!\n", configFile);
+        return;
+    }
+
+    char *delim = "=";
+    char *tmpStr = NULL;
+    char *buf = (char*) malloc(LINE * sizeof (char));
+    while (line = fgets(buf, LINE, fp)) {
+
+        trim(line);
+        if ((*line == '\n') || (strlen(line) == 0)) continue;
+
+        tmpStr = strtok(line, delim);
+        if ((tmpStr == NULL) || (strlen(tmpStr) == 0)) continue;
+        if (strcmp(tmpStr, "host") == 0) {
+            tmpStr = strtok(NULL, delim);
+            if (tmpStr != NULL)
+                strcpy(host, tmpStr);
+            else
+                strcpy(host, "");
+        } else if (strcmp(tmpStr, "port") == 0) {
+            tmpStr = strtok(NULL, delim);
+            if (tmpStr != NULL)
+                strcpy(port, tmpStr);
+            else
+                strcpy(port, "");
+        } else if (strcmp(tmpStr, "dbname") == 0) {
+            tmpStr = strtok(NULL, delim);
+            if (tmpStr != NULL)
+                strcpy(dbname, tmpStr);
+            else
+                strcpy(dbname, "");
+        } else if (strcmp(tmpStr, "user") == 0) {
+            tmpStr = strtok(NULL, delim);
+            if (tmpStr != NULL)
+                strcpy(user, tmpStr);
+            else
+                strcpy(user, "");
+        } else if (strcmp(tmpStr, "password") == 0) {
+            tmpStr = strtok(NULL, delim);
+            if (tmpStr != NULL)
+                strcpy(password, tmpStr);
+            else
+                strcpy(password, "");
+        } else if (strcmp(tmpStr, "options") == 0) {
+            tmpStr = strtok(NULL, delim);
+            if (tmpStr != NULL)
+                strcpy(options, tmpStr);
+            else
+                strcpy(options, "");
+        } else if (strcmp(tmpStr, "tty") == 0) {
+            tmpStr = strtok(NULL, delim);
+            if (tmpStr != NULL)
+                strcpy(tty, tmpStr);
+            else
+                strcpy(tty, "");
+        } else if (strcmp(tmpStr, "catfile_table") == 0) {
+            tmpStr = strtok(NULL, delim);
+            if (tmpStr != NULL)
+                strcpy(catfile_table, tmpStr);
+            else
+                strcpy(catfile_table, "");
+        } else if (strcmp(tmpStr, "match_table") == 0) {
+            tmpStr = strtok(NULL, delim);
+            if (tmpStr != NULL)
+                strcpy(match_table, tmpStr);
+            else
+                strcpy(match_table, "");
+        } else if (strcmp(tmpStr, "ot_table") == 0) {
+            tmpStr = strtok(NULL, delim);
+            if (tmpStr != NULL)
+                strcpy(ot_table, tmpStr);
+            else
+                strcpy(ot_table, "");
+        } else if (strcmp(tmpStr, "ot_flux_table") == 0) {
+            tmpStr = strtok(NULL, delim);
+            if (tmpStr != NULL)
+                strcpy(ot_flux_table, tmpStr);
+            else
+                strcpy(ot_flux_table, "");
+        }
+    }
+    free(buf);
+    fclose(fp);
 }
 
 void StoreDataPostgres::freeDbInfo() {
@@ -171,6 +198,299 @@ void StoreDataPostgres::freeDbInfo() {
     free(match_table);
     free(ot_table);
     free(ot_flux_table);
+}
+
+void StoreDataPostgres::storeCatfileInfo(StarFileFits *starFile, int fileType) {
+
+    PGresult *pgrst = NULL;
+    if (PQstatus(conn) == CONNECTION_BAD) {
+        fprintf(stderr, "connect db failed! %s\n", PQerrorMessage(conn));
+        PQfinish(conn);
+        return;
+    }
+
+    char *sqlBuf = (char*) malloc(MaxStringLength * sizeof (char));
+    sprintf(sqlBuf, "select catid from %s where catfile='%s'", catfile_table, starFile->fileName);
+    pgrst = PQexec(conn, sqlBuf);
+
+    if (PQresultStatus(pgrst) != PGRES_TUPLES_OK) {
+        PQclear(pgrst);
+        printf("query %s failure!\n", catfile_table);
+        printf("sql = %s\n", sqlBuf);
+        free(sqlBuf);
+        return;
+    }
+
+    //if fileName not in table catfile_id, add, and get catid again
+    if (PQntuples(pgrst) == 0) { //PQgetisnull
+        PQclear(pgrst);
+        char *fileTypeStr = "true";
+        if (!fileType)
+            fileTypeStr = "false";
+        sprintf(sqlBuf, "insert into %s(catfile,airmass,magdiff,jd,is_ref)values('%s',%lf,%f,%lf,%s)",
+                catfile_table, starFile->fileName, starFile->airmass, starFile->magDiff, starFile->jd, fileTypeStr);
+        pgrst = PQexec(conn, sqlBuf);
+        if (PQresultStatus(pgrst) != PGRES_COMMAND_OK) {
+            PQclear(pgrst);
+            printf("insert %s failure!\n", catfile_table);
+            printf("sql = %s\n", sqlBuf);
+            free(sqlBuf);
+            return;
+        } else {
+            //printf("insert catfile_id success!\n");
+        }
+
+        sprintf(sqlBuf, "select catid from %s where catfile='%s'", catfile_table, starFile->fileName);
+        pgrst = PQexec(conn, sqlBuf);
+        if (PQresultStatus(pgrst) != PGRES_TUPLES_OK) {
+            PQclear(pgrst);
+            printf("query %s failure!\n", catfile_table);
+            printf("sql = %s\n", sqlBuf);
+            free(sqlBuf);
+            return;
+        }
+    } else {
+        printf("%s already in table %s! please check!\n", starFile->fileName, catfile_table);
+    }
+
+    catid = atoi(PQgetvalue(pgrst, 0, 0));
+    //printf("catid = %d\n", catid);
+    free(sqlBuf);
+    PQclear(pgrst);
+}
+
+/**
+ * 存储模板星表和目标星表中匹配成功的已知星
+ * @param fileType
+ */
+void StoreDataPostgres::storeCatlog(StarFileFits *starFile, int fileType) {
+
+    PGresult *pgrst = NULL;
+    if (PQstatus(conn) == CONNECTION_BAD) {
+        fprintf(stderr, "connect db failed! %s\n", PQerrorMessage(conn));
+        PQfinish(conn);
+        return;
+    }
+
+    char *sqlBuf = (char*) malloc(MaxStringLength * sizeof (char));
+    //total 22 column, not include cid 
+    sprintf(sqlBuf, "COPY %s(\
+            starid,crossid,catid,magnorm,ra,dec,background,classstar,ellipticity,\
+            flags,mag,mage,fwhm,pixx,pixy,thetaimage,vignet,magcalib,magcalibe,\
+            pixx1,pixy1,fluxRatio)\
+            FROM STDIN WITH BINARY", match_table);
+
+    pgrst = PQexec(conn, sqlBuf);
+    if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
+
+        struct strBuffer *strBuf = initBinaryCopyBuf();
+        int i = 0;
+        CMStar *tStar = starFile->starList;
+        while (tStar) {
+            //存储模板星表，或者目标星表中匹配成功的已知星
+            if (fileType || ((tStar->match != NULL) && (tStar->error < starFile->areaBox))) {
+                starToBinaryBuf(tStar, fileType, strBuf);
+                int copydatares = PQputCopyData(conn, strBuf->data, strBuf->cursor);
+                if (copydatares == -1) {
+                    printf("copy error: %s\n", PQerrorMessage(conn));
+                }
+                strBuf->cursor = 0;
+                i++;
+                //if(i++ >5) break;
+            }
+            tStar = tStar->next;
+        }
+        freeBinaryCopyBuf(strBuf);
+        PQputCopyEnd(conn, NULL);
+    } else {
+        printf("copy error: %s\n", PQerrorMessage(conn));
+    }
+    PQclear(pgrst);
+    free(sqlBuf);
+}
+
+void StoreDataPostgres::storeOT(StarFileFits *starFile) {
+
+    PGresult *pgrst = NULL;
+    if (PQstatus(conn) == CONNECTION_BAD) {
+        fprintf(stderr, "connect db failed! %s\n", PQerrorMessage(conn));
+        PQfinish(conn);
+        return;
+    }
+
+    char *sqlBuf = (char*) malloc(MaxStringLength * sizeof (char));
+    //total 23 column, not include cid 
+    sprintf(sqlBuf, "COPY %s(\
+            starid,otid,catid,magnorm,ra,dec,background,classstar,ellipticity,\
+            flags,mag,mage,fwhm,pixx,pixy,thetaimage,vignet,inarea,\
+            magcalib,magcalibe,pixx1,pixy1,fluxRatio \
+            )FROM STDIN WITH BINARY", ot_table);
+
+    pgrst = PQexec(conn, sqlBuf);
+    if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
+
+        double timesOfSD = starFile->fluxRatioSDTimes * starFile->standardDeviation;
+        struct strBuffer *strBuf = initBinaryCopyBuf();
+        int i = 0;
+        CMStar *tStar = starFile->starList;
+        while (tStar) {
+            if ((tStar->error >= starFile->areaBox) && (tStar->inarea == 1)) {
+                starToBinaryBufOt(tStar, strBuf);
+                int copydatares = PQputCopyData(conn, strBuf->data, strBuf->cursor);
+                if (copydatares == -1) {
+                    printf("copy error: %s\n", PQerrorMessage(conn));
+                }
+                strBuf->cursor = 0;
+                i++;
+            }
+            tStar = tStar->next;
+        }
+        freeBinaryCopyBuf(strBuf);
+        PQputCopyEnd(conn, NULL);
+    } else {
+        printf("copy error: %s\n", PQerrorMessage(conn));
+    }
+    PQclear(pgrst);
+    free(sqlBuf);
+}
+
+void StoreDataPostgres::storeOTFlux(StarFileFits *starFile) {
+
+    PGresult *pgrst = NULL;
+    if (PQstatus(conn) == CONNECTION_BAD) {
+        fprintf(stderr, "connect db failed! %s\n", PQerrorMessage(conn));
+        PQfinish(conn);
+        return;
+    }
+
+    char *sqlBuf = (char*) malloc(MaxStringLength * sizeof (char));
+    //total 23 column, not include cid 
+    sprintf(sqlBuf, "COPY %s(\
+            starid,crossid,catid,magnorm,ra,dec,background,classstar,ellipticity,\
+            flags,mag,mage,fwhm,pixx,pixy,thetaimage,vignet,inarea,\
+            magcalib,magcalibe,pixx1,pixy1,fluxRatio \
+            )FROM STDIN WITH BINARY", ot_flux_table);
+
+    pgrst = PQexec(conn, sqlBuf);
+    if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
+
+        double timesOfSD = starFile->fluxRatioSDTimes * starFile->standardDeviation;
+        struct strBuffer *strBuf = initBinaryCopyBuf();
+        int i = 0;
+        CMStar *tStar = starFile->starList;
+        while (tStar) {
+            if ((tStar->match != NULL) && (tStar->error < starFile->areaBox)) { // && (tSample->mage < 0.05)
+                double ratioAbs = fabs(tStar->fluxRatio - starFile->fluxRatioMedian);
+                if (ratioAbs > timesOfSD) {
+                    starToBinaryBufOt(tStar, strBuf);
+                    int copydatares = PQputCopyData(conn, strBuf->data, strBuf->cursor);
+                    if (copydatares == -1) {
+                        printf("copy error: %s\n", PQerrorMessage(conn));
+                    }
+                    strBuf->cursor = 0;
+                    i++;
+                }
+            }
+            tStar = tStar->next;
+        }
+        freeBinaryCopyBuf(strBuf);
+        PQputCopyEnd(conn, NULL);
+    } else {
+        printf("copy error: %s\n", PQerrorMessage(conn));
+    }
+    PQclear(pgrst);
+    free(sqlBuf);
+}
+
+struct strBuffer * StoreDataPostgres::initBinaryCopyBuf() {
+
+    char *sendHeader = "PGCOPY\n\377\r\n\0";
+    unsigned int zero = '\0';
+
+    struct strBuffer *strBuf = (struct strBuffer*) malloc(sizeof (struct strBuffer));
+    strBuf->data = (char*) malloc(LINE * sizeof (char));
+    strBuf->len = MAX_BUFFER;
+
+    strBuf->cursor = 0;
+    memcpy(strBuf->data, sendHeader, 11);
+    strBuf->cursor += 11;
+    memcpy(strBuf->data + strBuf->cursor, (char*) &zero, 4);
+    strBuf->cursor += 4;
+    memcpy(strBuf->data + strBuf->cursor, (char*) &zero, 4);
+    strBuf->cursor += 4;
+}
+
+/**
+ * 存储模板及已知星
+ * @param tStar
+ * @param fileType
+ * @param strBuf
+ */
+void StoreDataPostgres::starToBinaryBuf(CMStar * tStar, int fileType, struct strBuffer *strBuf) {
+
+    unsigned short fieldNum = 22;
+    addInt16(strBuf, fieldNum); //column number, when add or delete colume, must change this number
+    addInt64(strBuf, tStar->id);
+    addInt64(strBuf, tStar->crossid);
+    addInt64(strBuf, catid);
+    addFloat8(strBuf, tStar->magnorm);
+    addFloat8(strBuf, tStar->alpha);
+    addFloat8(strBuf, tStar->delta);
+    addFloat8(strBuf, tStar->background);
+    addFloat8(strBuf, tStar->classstar);
+    addFloat8(strBuf, tStar->ellipticity);
+    addFloat8(strBuf, tStar->flags);
+    addFloat8(strBuf, tStar->mag);
+    addFloat8(strBuf, tStar->mage);
+    addFloat8(strBuf, tStar->fwhm);
+    addFloat8(strBuf, tStar->pixx);
+    addFloat8(strBuf, tStar->pixy);
+    addFloat8(strBuf, tStar->thetaimage);
+    addFloat8(strBuf, tStar->vignet);
+    addFloat8(strBuf, tStar->magcalib);
+    addFloat8(strBuf, tStar->magcalibe);
+    addFloat8(strBuf, tStar->pixx1);
+    addFloat8(strBuf, tStar->pixy1);
+    addFloat8(strBuf, tStar->fluxRatio);
+}
+
+/**
+ * 存储OT
+ * @param tStar
+ * @param strBuf
+ */
+void StoreDataPostgres::starToBinaryBufOt(CMStar * tStar, struct strBuffer *strBuf) {
+
+    unsigned short fieldNum = 23;
+    addInt16(strBuf, fieldNum); //column number, when add or delete colume, must change this number
+    addInt64(strBuf, tStar->id);
+    addInt64(strBuf, tStar->crossid);
+    addInt64(strBuf, catid);
+    addFloat8(strBuf, tStar->magnorm);
+    addFloat8(strBuf, tStar->alpha);
+    addFloat8(strBuf, tStar->delta);
+    addFloat8(strBuf, tStar->background);
+    addFloat8(strBuf, tStar->classstar);
+    addFloat8(strBuf, tStar->ellipticity);
+    addFloat8(strBuf, tStar->flags);
+    addFloat8(strBuf, tStar->mag);
+    addFloat8(strBuf, tStar->mage);
+    addFloat8(strBuf, tStar->fwhm);
+    addFloat8(strBuf, tStar->pixx);
+    addFloat8(strBuf, tStar->pixy);
+    addFloat8(strBuf, tStar->thetaimage);
+    addFloat8(strBuf, tStar->vignet);
+    addInt32(strBuf, tStar->inarea);
+    addFloat8(strBuf, tStar->magcalib);
+    addFloat8(strBuf, tStar->magcalibe);
+    addFloat8(strBuf, tStar->pixx1);
+    addFloat8(strBuf, tStar->pixy1);
+    addFloat8(strBuf, tStar->fluxRatio);
+}
+
+void StoreDataPostgres::freeBinaryCopyBuf(struct strBuffer *strBuf) {
+    free(strBuf);
+    free(strBuf->data);
 }
 
 void StoreDataPostgres::addInt16(struct strBuffer* strBuf, unsigned short i) {
@@ -288,361 +608,4 @@ void StoreDataPostgres::addFloat8(struct strBuffer* strBuf, double d) {
         strBuf->cursor -= 12;
     }
     strBuf->data[strBuf->cursor] = '\0';
-}
-
-void StoreDataPostgres::writeToDBBinary(struct SAMPLE *points, char *fileName, int fileType) {
-
-    if (points == NULL) return;
-
-    long start, end;
-    start = clock();
-
-    PGconn *conn = NULL;
-    PGresult *pgrst = NULL;
-
-
-    conn = PQsetdbLogin(host, port, options, tty, dbname, user, password);
-    if (PQstatus(conn) == CONNECTION_BAD) {
-        fprintf(stderr, "connect db failed! %s\n", PQerrorMessage(conn));
-        PQfinish(conn);
-        return;
-    }
-
-    float magDiff = 0.0;
-    if (!fileType) {
-        magDiff = getMagDiff(points);
-        fluxNorm(points, magDiff);
-    }
-
-    //!fileType
-    if (0) {
-        char *cleanSql = (char*) malloc(256 * sizeof (char));
-        sprintf(cleanSql, "delete from %s where catid=(select catid from %s where catfile='%s');", match_table, catfile_table, fileName); //delete match
-        PQexec(conn, cleanSql);
-        sprintf(cleanSql, "delete from %s where catid=(select catid from %s where catfile='%s');", ot_table, catfile_table, fileName); //delete ot
-        PQexec(conn, cleanSql);
-        sprintf(cleanSql, "delete from %s where catid=(select catid from %s where catfile='%s');", ot_flux_table, catfile_table, fileName); //delete ot
-        PQexec(conn, cleanSql);
-        sprintf(cleanSql, "delete from %s where catfile='%s';", catfile_table, fileName); //delete catfile
-        PQexec(conn, cleanSql);
-        free(cleanSql);
-    }
-    //printf("delete data from database!\n");
-
-    char *sqlBuf = (char*) malloc(256 * sizeof (char));
-    //get fileName's catfile_id catid
-    sprintf(sqlBuf, "select catid from %s where catfile='%s'", catfile_table, fileName);
-    pgrst = PQexec(conn, sqlBuf);
-
-    if (PQresultStatus(pgrst) != PGRES_TUPLES_OK) {
-        PQclear(pgrst);
-        printf("query %s failure!\n", catfile_table);
-        printf("sql = %s\n", sqlBuf);
-        return;
-    }
-
-    long catid = 0;
-    //if fileName not in table catfile_id, add, and get catid again
-    if (PQntuples(pgrst) == 0) { //PQgetisnull
-        PQclear(pgrst);
-        char *fileTypeStr = "true";
-        if (!fileType)
-            fileTypeStr = "false";
-        sprintf(sqlBuf, "insert into %s(catfile,airmass,magdiff,jd,is_ref)values('%s',%lf,%f,%lf,%s)", catfile_table, fileName, airmass, magDiff, jd, fileTypeStr);
-        pgrst = PQexec(conn, sqlBuf);
-        if (PQresultStatus(pgrst) != PGRES_COMMAND_OK) {
-            PQclear(pgrst);
-            printf("insert %s failure!\n", catfile_table);
-            printf("sql = %s\n", sqlBuf);
-            return;
-        } else {
-            //printf("insert catfile_id success!\n");
-        }
-
-        sprintf(sqlBuf, "select catid from %s where catfile='%s'", catfile_table, fileName);
-        pgrst = PQexec(conn, sqlBuf);
-        if (PQresultStatus(pgrst) != PGRES_TUPLES_OK) {
-            PQclear(pgrst);
-            printf("query %s failure!\n", catfile_table);
-            printf("sql = %s\n", sqlBuf);
-            return;
-        }
-    } else {
-        PQfinish(conn);
-        //printf("%s already in table %s! please check!\n", fileName, catfile_table);
-        free(sqlBuf);
-        return;
-    }
-    catid = atoi(PQgetvalue(pgrst, 0, 0));
-    //printf("catid = %d\n", catid);
-    PQclear(pgrst);
-
-    char *buf = (char*) malloc(1024 * sizeof (char));
-
-
-    unsigned short fieldNum = 21;
-    char *sendHeader = "PGCOPY\n\377\r\n\0";
-    unsigned int zero = '\0';
-    struct strBuffer strBuf;
-    strBuf.data = buf;
-    strBuf.len = MAX_BUFFER;
-
-    int i = 0;
-    int j = 0;
-    int k = 0;
-    struct SAMPLE *tSample;
-    if (fileType) { //insert reference file
-        //total 19 column, not include cid 
-        //char *sql1 = "COPY crossmatch_id(\
-            starid,crossid,catid,magnorm,ra,dec,background,classstar,ellipticity,flags,mag,mage,fwhm,pixx,pixy,thetaimage,vignet,\
-            magcalib,magcalibe \
-            )FROM STDIN WITH BINARY";
-        sprintf(sqlBuf, "COPY %s(\
-            starid,crossid,catid,magnorm,ra,dec,background,classstar,ellipticity,flags,mag,mage,fwhm,pixx,pixy,thetaimage,vignet,\
-            magcalib,magcalibe,pixx1,pixy1 \
-            )FROM STDIN WITH BINARY", match_table);
-        pgrst = PQexec(conn, sqlBuf);
-        if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
-            strBuf.cursor = 0;
-            memcpy(strBuf.data, sendHeader, 11);
-            strBuf.cursor += 11;
-            memcpy(strBuf.data + strBuf.cursor, (char*) &zero, 4);
-            strBuf.cursor += 4;
-            memcpy(strBuf.data + strBuf.cursor, (char*) &zero, 4);
-            strBuf.cursor += 4;
-            
-            tSample = points->next;
-            while (tSample) {
-                addInt16(&strBuf, fieldNum); //column number, when add or delete colume, must change this number
-                addInt64(&strBuf, tSample->id);
-                addInt64(&strBuf, tSample->crossid);
-                addInt64(&strBuf, catid);
-                addFloat8(&strBuf, -1.0);
-                addFloat8(&strBuf, tSample->alpha);
-                addFloat8(&strBuf, tSample->delta);
-                addFloat8(&strBuf, tSample->background);
-                addFloat8(&strBuf, tSample->classstar);
-                addFloat8(&strBuf, tSample->ellipticity);
-                addFloat8(&strBuf, tSample->flags);
-                addFloat8(&strBuf, tSample->mag);
-                addFloat8(&strBuf, tSample->mage);
-                addFloat8(&strBuf, tSample->fwhm);
-                addFloat8(&strBuf, tSample->pixx);
-                addFloat8(&strBuf, tSample->pixy);
-                addFloat8(&strBuf, tSample->thetaimage);
-                addFloat8(&strBuf, tSample->vignet);
-                addFloat8(&strBuf, tSample->magcalib);
-                addFloat8(&strBuf, tSample->magcalibe);
-                addFloat8(&strBuf, tSample->pixx);
-                addFloat8(&strBuf, tSample->pixy);
-                int copydatares = PQputCopyData(conn, strBuf.data, strBuf.cursor);
-                //if(i >5) break;
-                i++;
-                tSample = tSample->next;
-                strBuf.cursor = 0;
-            }
-
-            PQputCopyEnd(conn, NULL);
-        } else {
-            printf("can not copy in!\n");
-        }
-        PQclear(pgrst);
-    }else{// insert sample file  !fileType
-        //insert sample file matched
-        fieldNum = 22;
-        strBuf.cursor = 0;
-        memcpy(strBuf.data, sendHeader, 11);
-        strBuf.cursor += 11;
-        memcpy(strBuf.data + strBuf.cursor, (char*) &zero, 4);
-        strBuf.cursor += 4;
-        memcpy(strBuf.data + strBuf.cursor, (char*) &zero, 4);
-        strBuf.cursor += 4;
-
-        sprintf(sqlBuf, "COPY %s(\
-                starid,crossid,catid,magnorm,ra,dec,background,classstar,ellipticity,flags,mag,mage,fwhm,pixx,pixy,thetaimage,vignet,\
-                magcalib,magcalibe,pixx1,pixy1,fluxRatio \
-                )FROM STDIN WITH BINARY", match_table);
-
-        pgrst = PQexec(conn, sqlBuf);
-        if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
-            tSample = points->next;
-            while (tSample) {
-                if ((tSample->reference != NULL) && (tSample->error < areaBox)) {
-                    addInt16(&strBuf, fieldNum); //column number, when add or delete colume, must change this number
-                    addInt64(&strBuf, tSample->id);
-                    addInt64(&strBuf, tSample->crossid);
-                    addInt64(&strBuf, catid);
-                    addFloat8(&strBuf, tSample->magnorm);
-                    addFloat8(&strBuf, tSample->alpha);
-                    addFloat8(&strBuf, tSample->delta);
-                    addFloat8(&strBuf, tSample->background);
-                    addFloat8(&strBuf, tSample->classstar);
-                    addFloat8(&strBuf, tSample->ellipticity);
-                    addFloat8(&strBuf, tSample->flags);
-                    addFloat8(&strBuf, tSample->mag);
-                    addFloat8(&strBuf, tSample->mage);
-                    addFloat8(&strBuf, tSample->fwhm);
-                    addFloat8(&strBuf, tSample->pixx);
-                    addFloat8(&strBuf, tSample->pixy);
-                    addFloat8(&strBuf, tSample->thetaimage);
-                    addFloat8(&strBuf, tSample->vignet);
-                    addFloat8(&strBuf, tSample->magcalib);
-                    addFloat8(&strBuf, tSample->magcalibe);
-                    addFloat8(&strBuf, tSample->pixx1);
-                    addFloat8(&strBuf, tSample->pixy1);
-                    addFloat8(&strBuf, tSample->fluxRatio);
-                
-                    int copydatares = PQputCopyData(conn, strBuf.data, strBuf.cursor);
-                    i++;
-                    strBuf.cursor = 0;
-                }
-                tSample = tSample->next;
-            }
-            PQputCopyEnd(conn, NULL);
-        }
-        PQclear(pgrst);
-        
-        if(fluxRatioSDTimes>0)
-        {
-        //insert sample file matched and filter by flux
-        fieldNum = 22;
-        strBuf.cursor = 0;
-        memcpy(strBuf.data, sendHeader, 11);
-        strBuf.cursor += 11;
-        memcpy(strBuf.data + strBuf.cursor, (char*) &zero, 4);
-        strBuf.cursor += 4;
-        memcpy(strBuf.data + strBuf.cursor, (char*) &zero, 4);
-        strBuf.cursor += 4;
-
-        sprintf(sqlBuf, "COPY %s(\
-                starid,crossid,catid,magnorm,ra,dec,background,classstar,ellipticity,flags,mag,mage,fwhm,pixx,pixy,thetaimage,vignet,\
-                magcalib,magcalibe,pixx1,pixy1,fluxRatio \
-                )FROM STDIN WITH BINARY", ot_flux_table);
-
-        pgrst = PQexec(conn, sqlBuf);
-        if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
-            tSample = points->next;
-            //printf("fluxRatioSDTimes=%d\n",fluxRatioSDTimes);
-            //printf("standardDeviation=%f\n",standardDeviation);
-            //printf("fluxRatioAverage=%f\n",fluxRatioAverage);
-            //printf("standardDeviation*fluxRatioSDTimes=%f\n",standardDeviation*fluxRatioSDTimes);
-            double timesOfSD = fluxRatioSDTimes*standardDeviation;
-            while (tSample) {
-                if ((tSample->reference != NULL) && (tSample->error < areaBox)) { // && (tSample->mage < 0.05)
-                    double ratioAbs = fabs(tSample->fluxRatio - fluxRatioMedian);
-                    //double ratioAbs = 0;
-                    //if(tIndex<100)
-                    //printf("magDiffs[%d]=%f\tratioAbs=%f\n", tIndex, magDiffs[tIndex],ratioAbs);
-                    if(ratioAbs > timesOfSD)
-                    {
-                        addInt16(&strBuf, fieldNum); //column number, when add or delete colume, must change this number
-                        addInt64(&strBuf, tSample->id);
-                        addInt64(&strBuf, tSample->crossid);
-                        addInt64(&strBuf, catid);
-                        addFloat8(&strBuf, tSample->magnorm);
-                        addFloat8(&strBuf, tSample->alpha);
-                        addFloat8(&strBuf, tSample->delta);
-                        addFloat8(&strBuf, tSample->background);
-                        addFloat8(&strBuf, tSample->classstar);
-                        addFloat8(&strBuf, tSample->ellipticity);
-                        addFloat8(&strBuf, tSample->flags);
-                        addFloat8(&strBuf, tSample->mag);
-                        addFloat8(&strBuf, tSample->mage);
-                        addFloat8(&strBuf, tSample->fwhm);
-                        addFloat8(&strBuf, tSample->pixx);
-                        addFloat8(&strBuf, tSample->pixy);
-                        addFloat8(&strBuf, tSample->thetaimage);
-                        addFloat8(&strBuf, tSample->vignet);
-                        addFloat8(&strBuf, tSample->magcalib);
-                        addFloat8(&strBuf, tSample->magcalibe);
-                        addFloat8(&strBuf, tSample->pixx1);
-                        addFloat8(&strBuf, tSample->pixy1);
-                        addFloat8(&strBuf, tSample->fluxRatio);
-
-                        int copydatares = PQputCopyData(conn, strBuf.data, strBuf.cursor);
-                        k++;
-                        strBuf.cursor = 0;
-                    }
-                }
-                tSample = tSample->next;
-            }
-            PQputCopyEnd(conn, NULL);
-        }
-        PQclear(pgrst);
-        }
-
-        //insert sample file unmatched
-        fieldNum = 22;
-        strBuf.cursor = 0;
-        memcpy(strBuf.data, sendHeader, 11);
-        strBuf.cursor += 11;
-        memcpy(strBuf.data + strBuf.cursor, (char*) &zero, 4);
-        strBuf.cursor += 4;
-        memcpy(strBuf.data + strBuf.cursor, (char*) &zero, 4);
-        strBuf.cursor += 4;
-        //char *sql2 = "COPY OT_id(\
-                starid,otid,catid,magnorm,ra,dec,background,classstar,ellipticity,flags,mag,mage,fwhm,pixx,pixy,thetaimage,vignet,inarea,\
-                magcalib,magcalibe \
-                )FROM STDIN WITH BINARY";
-        sprintf(sqlBuf, "COPY %s(\
-                starid,otid,catid,magnorm,ra,dec,background,classstar,ellipticity,flags,mag,mage,fwhm,pixx,pixy,thetaimage,vignet,inarea,\
-                magcalib,magcalibe,pixx1,pixy1 \
-                )FROM STDIN WITH BINARY", ot_table);
-        //printf("%s\n",sqlBuf);
-        pgrst = PQexec(conn, sqlBuf);
-        if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
-            tSample = points->next;
-            while (tSample) {
-                if ((tSample->error >= areaBox) && (tSample->inarea == 1)) {
-
-                    addInt16(&strBuf, fieldNum); //column number, when add or delete colume, must change this number
-                    addInt64(&strBuf, tSample->id);
-                    addInt64(&strBuf, tSample->crossid);
-                    addInt64(&strBuf, catid);
-                    addFloat8(&strBuf, tSample->magnorm);
-                    addFloat8(&strBuf, tSample->alpha);
-                    addFloat8(&strBuf, tSample->delta);
-                    addFloat8(&strBuf, tSample->background);
-                    addFloat8(&strBuf, tSample->classstar);
-                    addFloat8(&strBuf, tSample->ellipticity);
-                    addFloat8(&strBuf, tSample->flags);
-                    addFloat8(&strBuf, tSample->mag);
-                    addFloat8(&strBuf, tSample->mage);
-                    addFloat8(&strBuf, tSample->fwhm);
-                    addFloat8(&strBuf, tSample->pixx);
-                    addFloat8(&strBuf, tSample->pixy);
-                    addFloat8(&strBuf, tSample->thetaimage);
-                    addFloat8(&strBuf, tSample->vignet);
-                    addInt32(&strBuf, tSample->inarea);
-                    addFloat8(&strBuf, tSample->magcalib);
-                    addFloat8(&strBuf, tSample->magcalibe);
-                    addFloat8(&strBuf, tSample->pixx1);
-                    addFloat8(&strBuf, tSample->pixy1);
-                
-                    int copydatares = PQputCopyData(conn, strBuf.data, strBuf.cursor);
-
-                    j++;
-                    strBuf.cursor = 0;
-                }
-                tSample = tSample->next;
-            }
-            PQputCopyEnd(conn, NULL);
-        }
-        PQclear(pgrst);
-    }
-
-
-    PQfinish(conn);
-    free(buf);
-    free(sqlBuf);
-
-    end = clock();
-    if (showProcessInfo) {
-        printf("write table %s %d row\n", match_table, i);
-        if (!fileType) {
-            printf("write table %s %d row\n", ot_table, j);
-            printf("write table %s %d row\n", ot_flux_table, k);
-        }
-        printf("time of write DB is: %fs\n", (end - start)*1.0 / ONESECOND);
-    }
 }

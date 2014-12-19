@@ -12,9 +12,9 @@
 
 class StoreData {
 protected:
-  
+
 public:
-  virtual void store(StarFile *starFile) = 0;
+    virtual void store(StarFile *starFile) = 0;
 };
 
 #endif	/* STOREDATA_H */

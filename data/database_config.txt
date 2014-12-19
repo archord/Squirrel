@@ -1,0 +1,9 @@
+host=localhost
+port=5432
+dbname=gwac2
+user=xy
+password=xyag902
+catfile_table=catfile_20141217
+match_table=crossmatch_20141217
+ot_table=ot_20141217
+ot_flux_table=ot_flux_20141217

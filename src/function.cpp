@@ -19,9 +19,8 @@
 #include <time.h>
 #include <arpa/inet.h>
 
+#include "libpq-fe.h" 
 #include "fitsio.h"
-#include "libpq-fe.h"
-
 #include "anwcs.h"
 #include "wcs.h"
 #include "fitsfile.h"
@@ -124,7 +123,6 @@ double standardDeviation = 0.0;
 int fluxRatioSDTimes = 0; //abs(ratioRatio - flusRatioAverage) > flusRatioSD * standardDeviation;
 double fluxRatioAverage = 0.0;
 double fluxRatioMedian = 0.0;
-
 
 void initDbInfo() {
 
@@ -1333,9 +1331,8 @@ float getMagDiff(struct SAMPLE *sample) {
     int totalSample = 0;
     struct SAMPLE *tSample = sample->next;
     while (tSample) {
-        if ((tSample->reference != NULL) && (tSample->error < areaBox))
-        {
-            if(tSample->mage < 0.05)
+        if ((tSample->reference != NULL) && (tSample->error < areaBox)) {
+            if (tSample->mage < 0.05)
                 tMatched++;
             totalSample++;
         }
@@ -1350,14 +1347,13 @@ float getMagDiff(struct SAMPLE *sample) {
         if ((tSample->reference != NULL) && (tSample->error < areaBox)) {
             tSample->fluxRatio = pow10(-0.4 * (tSample->reference->mag - tSample->mag));
             samplesArray[j++] = tSample->fluxRatio;
-            if((tSample->mage < 0.05))
-            {
+            if ((tSample->mage < 0.05)) {
                 magDiffs[i++] = tSample->fluxRatio;
             }
         }
         tSample = tSample->next;
     }
-    
+
     fluxRatioAverage = getAverage(samplesArray, totalSample);
     standardDeviation = getStandardDeviation(samplesArray, totalSample, fluxRatioAverage);
 
@@ -1969,7 +1965,7 @@ void writeToDBBinary(struct SAMPLE *points, char *fileName, int fileType) {
             strBuf.cursor += 4;
             memcpy(strBuf.data + strBuf.cursor, (char*) &zero, 4);
             strBuf.cursor += 4;
-            
+
             tSample = points->next;
             while (tSample) {
                 addInt16(&strBuf, fieldNum); //column number, when add or delete colume, must change this number
@@ -2006,7 +2002,7 @@ void writeToDBBinary(struct SAMPLE *points, char *fileName, int fileType) {
             printf("can not copy in!\n");
         }
         PQclear(pgrst);
-    }else{// insert sample file  !fileType
+    } else {// insert sample file  !fileType
         //insert sample file matched
         fieldNum = 22;
         strBuf.cursor = 0;
@@ -2050,7 +2046,7 @@ void writeToDBBinary(struct SAMPLE *points, char *fileName, int fileType) {
                     addFloat8(&strBuf, tSample->pixx1);
                     addFloat8(&strBuf, tSample->pixy1);
                     addFloat8(&strBuf, tSample->fluxRatio);
-                
+
                     int copydatares = PQputCopyData(conn, strBuf.data, strBuf.cursor);
                     i++;
                     strBuf.cursor = 0;
@@ -2060,74 +2056,72 @@ void writeToDBBinary(struct SAMPLE *points, char *fileName, int fileType) {
             PQputCopyEnd(conn, NULL);
         }
         PQclear(pgrst);
-        
-        if(fluxRatioSDTimes>0)
-        {
-        //insert sample file matched and filter by flux
-        fieldNum = 22;
-        strBuf.cursor = 0;
-        memcpy(strBuf.data, sendHeader, 11);
-        strBuf.cursor += 11;
-        memcpy(strBuf.data + strBuf.cursor, (char*) &zero, 4);
-        strBuf.cursor += 4;
-        memcpy(strBuf.data + strBuf.cursor, (char*) &zero, 4);
-        strBuf.cursor += 4;
 
-        sprintf(sqlBuf, "COPY %s(\
+        if (fluxRatioSDTimes > 0) {
+            //insert sample file matched and filter by flux
+            fieldNum = 22;
+            strBuf.cursor = 0;
+            memcpy(strBuf.data, sendHeader, 11);
+            strBuf.cursor += 11;
+            memcpy(strBuf.data + strBuf.cursor, (char*) &zero, 4);
+            strBuf.cursor += 4;
+            memcpy(strBuf.data + strBuf.cursor, (char*) &zero, 4);
+            strBuf.cursor += 4;
+
+            sprintf(sqlBuf, "COPY %s(\
                 starid,crossid,catid,magnorm,ra,dec,background,classstar,ellipticity,flags,mag,mage,fwhm,pixx,pixy,thetaimage,vignet,\
                 magcalib,magcalibe,pixx1,pixy1,fluxRatio \
                 )FROM STDIN WITH BINARY", ot_flux_table);
 
-        pgrst = PQexec(conn, sqlBuf);
-        if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
-            tSample = points->next;
-            //printf("fluxRatioSDTimes=%d\n",fluxRatioSDTimes);
-            //printf("standardDeviation=%f\n",standardDeviation);
-            //printf("fluxRatioAverage=%f\n",fluxRatioAverage);
-            //printf("standardDeviation*fluxRatioSDTimes=%f\n",standardDeviation*fluxRatioSDTimes);
-            double timesOfSD = fluxRatioSDTimes*standardDeviation;
-            while (tSample) {
-                if ((tSample->reference != NULL) && (tSample->error < areaBox)) { // && (tSample->mage < 0.05)
-                    double ratioAbs = fabs(tSample->fluxRatio - fluxRatioMedian);
-                    //double ratioAbs = 0;
-                    //if(tIndex<100)
-                    //printf("magDiffs[%d]=%f\tratioAbs=%f\n", tIndex, magDiffs[tIndex],ratioAbs);
-                    if(ratioAbs > timesOfSD)
-                    {
-                        addInt16(&strBuf, fieldNum); //column number, when add or delete colume, must change this number
-                        addInt64(&strBuf, tSample->id);
-                        addInt64(&strBuf, tSample->crossid);
-                        addInt64(&strBuf, catid);
-                        addFloat8(&strBuf, tSample->magnorm);
-                        addFloat8(&strBuf, tSample->alpha);
-                        addFloat8(&strBuf, tSample->delta);
-                        addFloat8(&strBuf, tSample->background);
-                        addFloat8(&strBuf, tSample->classstar);
-                        addFloat8(&strBuf, tSample->ellipticity);
-                        addFloat8(&strBuf, tSample->flags);
-                        addFloat8(&strBuf, tSample->mag);
-                        addFloat8(&strBuf, tSample->mage);
-                        addFloat8(&strBuf, tSample->fwhm);
-                        addFloat8(&strBuf, tSample->pixx);
-                        addFloat8(&strBuf, tSample->pixy);
-                        addFloat8(&strBuf, tSample->thetaimage);
-                        addFloat8(&strBuf, tSample->vignet);
-                        addFloat8(&strBuf, tSample->magcalib);
-                        addFloat8(&strBuf, tSample->magcalibe);
-                        addFloat8(&strBuf, tSample->pixx1);
-                        addFloat8(&strBuf, tSample->pixy1);
-                        addFloat8(&strBuf, tSample->fluxRatio);
+            pgrst = PQexec(conn, sqlBuf);
+            if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
+                tSample = points->next;
+                //printf("fluxRatioSDTimes=%d\n",fluxRatioSDTimes);
+                //printf("standardDeviation=%f\n",standardDeviation);
+                //printf("fluxRatioAverage=%f\n",fluxRatioAverage);
+                //printf("standardDeviation*fluxRatioSDTimes=%f\n",standardDeviation*fluxRatioSDTimes);
+                double timesOfSD = fluxRatioSDTimes*standardDeviation;
+                while (tSample) {
+                    if ((tSample->reference != NULL) && (tSample->error < areaBox)) { // && (tSample->mage < 0.05)
+                        double ratioAbs = fabs(tSample->fluxRatio - fluxRatioMedian);
+                        //double ratioAbs = 0;
+                        //if(tIndex<100)
+                        //printf("magDiffs[%d]=%f\tratioAbs=%f\n", tIndex, magDiffs[tIndex],ratioAbs);
+                        if (ratioAbs > timesOfSD) {
+                            addInt16(&strBuf, fieldNum); //column number, when add or delete colume, must change this number
+                            addInt64(&strBuf, tSample->id);
+                            addInt64(&strBuf, tSample->crossid);
+                            addInt64(&strBuf, catid);
+                            addFloat8(&strBuf, tSample->magnorm);
+                            addFloat8(&strBuf, tSample->alpha);
+                            addFloat8(&strBuf, tSample->delta);
+                            addFloat8(&strBuf, tSample->background);
+                            addFloat8(&strBuf, tSample->classstar);
+                            addFloat8(&strBuf, tSample->ellipticity);
+                            addFloat8(&strBuf, tSample->flags);
+                            addFloat8(&strBuf, tSample->mag);
+                            addFloat8(&strBuf, tSample->mage);
+                            addFloat8(&strBuf, tSample->fwhm);
+                            addFloat8(&strBuf, tSample->pixx);
+                            addFloat8(&strBuf, tSample->pixy);
+                            addFloat8(&strBuf, tSample->thetaimage);
+                            addFloat8(&strBuf, tSample->vignet);
+                            addFloat8(&strBuf, tSample->magcalib);
+                            addFloat8(&strBuf, tSample->magcalibe);
+                            addFloat8(&strBuf, tSample->pixx1);
+                            addFloat8(&strBuf, tSample->pixy1);
+                            addFloat8(&strBuf, tSample->fluxRatio);
 
-                        int copydatares = PQputCopyData(conn, strBuf.data, strBuf.cursor);
-                        k++;
-                        strBuf.cursor = 0;
+                            int copydatares = PQputCopyData(conn, strBuf.data, strBuf.cursor);
+                            k++;
+                            strBuf.cursor = 0;
+                        }
                     }
+                    tSample = tSample->next;
                 }
-                tSample = tSample->next;
+                PQputCopyEnd(conn, NULL);
             }
-            PQputCopyEnd(conn, NULL);
-        }
-        PQclear(pgrst);
+            PQclear(pgrst);
         }
 
         //insert sample file unmatched
@@ -2177,7 +2171,7 @@ void writeToDBBinary(struct SAMPLE *points, char *fileName, int fileType) {
                     addFloat8(&strBuf, tSample->magcalibe);
                     addFloat8(&strBuf, tSample->pixx1);
                     addFloat8(&strBuf, tSample->pixy1);
-                
+
                     int copydatares = PQputCopyData(conn, strBuf.data, strBuf.cursor);
 
                     j++;

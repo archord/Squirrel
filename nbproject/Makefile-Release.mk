@@ -36,8 +36,14 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/_ext/1246618051/main.o \
+	${OBJECTDIR}/src/CrossMatch.o \
+	${OBJECTDIR}/src/CrossMatchSphere.o \
+	${OBJECTDIR}/src/Partition.o \
+	${OBJECTDIR}/src/PartitionSphere.o \
+	${OBJECTDIR}/src/StarFile.o \
+	${OBJECTDIR}/src/StarFileFits.o \
 	${OBJECTDIR}/src/StoreDataPostgres.o \
-	${OBJECTDIR}/src/function.o
+	${OBJECTDIR}/src/cmutils.o
 
 
 # C Compiler Flags
@@ -69,15 +75,45 @@ ${OBJECTDIR}/_ext/1246618051/main.o: ../Squirrel/src/main.cpp
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1246618051/main.o ../Squirrel/src/main.cpp
 
+${OBJECTDIR}/src/CrossMatch.o: src/CrossMatch.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/CrossMatch.o src/CrossMatch.cpp
+
+${OBJECTDIR}/src/CrossMatchSphere.o: src/CrossMatchSphere.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/CrossMatchSphere.o src/CrossMatchSphere.cpp
+
+${OBJECTDIR}/src/Partition.o: src/Partition.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Partition.o src/Partition.cpp
+
+${OBJECTDIR}/src/PartitionSphere.o: src/PartitionSphere.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PartitionSphere.o src/PartitionSphere.cpp
+
+${OBJECTDIR}/src/StarFile.o: src/StarFile.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/StarFile.o src/StarFile.cpp
+
+${OBJECTDIR}/src/StarFileFits.o: src/StarFileFits.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/StarFileFits.o src/StarFileFits.cpp
+
 ${OBJECTDIR}/src/StoreDataPostgres.o: src/StoreDataPostgres.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/StoreDataPostgres.o src/StoreDataPostgres.cpp
 
-${OBJECTDIR}/src/function.o: src/function.cpp 
+${OBJECTDIR}/src/cmutils.o: src/cmutils.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/function.o src/function.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/cmutils.o src/cmutils.cpp
 
 # Subprojects
 .build-subprojects:

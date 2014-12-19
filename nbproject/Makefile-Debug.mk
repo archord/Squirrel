@@ -36,8 +36,14 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/_ext/1246618051/main.o \
+	${OBJECTDIR}/src/CrossMatch.o \
+	${OBJECTDIR}/src/CrossMatchSphere.o \
+	${OBJECTDIR}/src/Partition.o \
+	${OBJECTDIR}/src/PartitionSphere.o \
+	${OBJECTDIR}/src/StarFile.o \
+	${OBJECTDIR}/src/StarFileFits.o \
 	${OBJECTDIR}/src/StoreDataPostgres.o \
-	${OBJECTDIR}/src/function.o
+	${OBJECTDIR}/src/cmutils.o
 
 
 # C Compiler Flags
@@ -67,17 +73,47 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/squirrel: ${OBJECTFILES}
 ${OBJECTDIR}/_ext/1246618051/main.o: ../Squirrel/src/main.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1246618051
 	${RM} $@.d
-	$(COMPILE.cc) -g -Ilibrary/astrometry.net-0.38/include -Ilibrary/cfitsio/include -Ilibrary/wcstools-3.8.5/include -I../CrossMatchLibrary/src -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1246618051/main.o ../Squirrel/src/main.cpp
+	$(COMPILE.cc) -g -Ilibrary/astrometry.net-0.38/include -Ilibrary/cfitsio/include -Ilibrary/wcstools-3.8.5/include -I../CrossMatchLibrary/src -I/usr/include/postgresql -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1246618051/main.o ../Squirrel/src/main.cpp
+
+${OBJECTDIR}/src/CrossMatch.o: src/CrossMatch.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -Ilibrary/astrometry.net-0.38/include -Ilibrary/cfitsio/include -Ilibrary/wcstools-3.8.5/include -I../CrossMatchLibrary/src -I/usr/include/postgresql -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/CrossMatch.o src/CrossMatch.cpp
+
+${OBJECTDIR}/src/CrossMatchSphere.o: src/CrossMatchSphere.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -Ilibrary/astrometry.net-0.38/include -Ilibrary/cfitsio/include -Ilibrary/wcstools-3.8.5/include -I../CrossMatchLibrary/src -I/usr/include/postgresql -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/CrossMatchSphere.o src/CrossMatchSphere.cpp
+
+${OBJECTDIR}/src/Partition.o: src/Partition.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -Ilibrary/astrometry.net-0.38/include -Ilibrary/cfitsio/include -Ilibrary/wcstools-3.8.5/include -I../CrossMatchLibrary/src -I/usr/include/postgresql -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Partition.o src/Partition.cpp
+
+${OBJECTDIR}/src/PartitionSphere.o: src/PartitionSphere.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -Ilibrary/astrometry.net-0.38/include -Ilibrary/cfitsio/include -Ilibrary/wcstools-3.8.5/include -I../CrossMatchLibrary/src -I/usr/include/postgresql -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PartitionSphere.o src/PartitionSphere.cpp
+
+${OBJECTDIR}/src/StarFile.o: src/StarFile.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -Ilibrary/astrometry.net-0.38/include -Ilibrary/cfitsio/include -Ilibrary/wcstools-3.8.5/include -I../CrossMatchLibrary/src -I/usr/include/postgresql -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/StarFile.o src/StarFile.cpp
+
+${OBJECTDIR}/src/StarFileFits.o: src/StarFileFits.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -Ilibrary/astrometry.net-0.38/include -Ilibrary/cfitsio/include -Ilibrary/wcstools-3.8.5/include -I../CrossMatchLibrary/src -I/usr/include/postgresql -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/StarFileFits.o src/StarFileFits.cpp
 
 ${OBJECTDIR}/src/StoreDataPostgres.o: src/StoreDataPostgres.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Ilibrary/astrometry.net-0.38/include -Ilibrary/cfitsio/include -Ilibrary/wcstools-3.8.5/include -I../CrossMatchLibrary/src -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/StoreDataPostgres.o src/StoreDataPostgres.cpp
+	$(COMPILE.cc) -g -Ilibrary/astrometry.net-0.38/include -Ilibrary/cfitsio/include -Ilibrary/wcstools-3.8.5/include -I../CrossMatchLibrary/src -I/usr/include/postgresql -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/StoreDataPostgres.o src/StoreDataPostgres.cpp
 
-${OBJECTDIR}/src/function.o: src/function.cpp 
+${OBJECTDIR}/src/cmutils.o: src/cmutils.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -g -Ilibrary/astrometry.net-0.38/include -Ilibrary/cfitsio/include -Ilibrary/wcstools-3.8.5/include -I../CrossMatchLibrary/src -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/function.o src/function.cpp
+	$(COMPILE.cc) -g -Ilibrary/astrometry.net-0.38/include -Ilibrary/cfitsio/include -Ilibrary/wcstools-3.8.5/include -I../CrossMatchLibrary/src -I/usr/include/postgresql -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/cmutils.o src/cmutils.cpp
 
 # Subprojects
 .build-subprojects:

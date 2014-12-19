@@ -25,8 +25,12 @@
       <runprofile version="9">
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -method sphere -errorRadius 0.06 -fitsHDU 3 -ref  P_130112_177d55072_60d851283-472.Fcat -sample P_130112_177d55072_60d851283-473.Fcat</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -method sphere -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -method sphere -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile database_config.txt</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -method sphere -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile data/database_config.txt</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <runcommand>"${OUTPUT_PATH}"  -method sphere -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile data/database_config.txt</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>
