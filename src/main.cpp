@@ -24,6 +24,7 @@
 
 
 void showHelp();
+void setDefaultValue();
 void getDBInfo(char *param, StoreDataPostgres *dataStore);
 int getStrValue(char *src, char *name, char *value);
 int parsePara(int argc, char** argv);
@@ -46,6 +47,8 @@ int areaHeight;
 float planeErrorRedius;
 int fluxRatioSDTimes; //factor of flux filter
 
+int gridSize; //对星表进行分区计算fluxratio，gridSize为分区的大小。
+
 int cpu;
 int method;
 char *cmdDbInfo;
@@ -64,9 +67,12 @@ int main(int argc, char** argv) {
         showHelp();
         return 0;
     }
+    
+    setDefaultValue();
 
     method = PLANE_METHOD;
     cpu = 1;
+    gridSize = 1;
     cmdDbInfo = (char*) malloc(LINE);
     memset(cmdDbInfo, 0, LINE);
     refFile = (char*) malloc(LINE);
@@ -121,17 +127,17 @@ void mainPlane(char *refFile, char *objFile, char *outFile) {
 void mainSphere(char *refFile, char *objFile, char *outFile) {
 
     int wcsext = 2;
-    int magErrThreshold = 0.05; //used by getMagDiff
+    float magErrThreshold = 0.05; //used by getMagDiff
 
     StarFileFits *refStarFile, *objStarFile;
-    refStarFile = new StarFileFits(refFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold);
+    refStarFile = new StarFileFits(refFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold, gridSize);
     printf("read ref file\n");
     refStarFile->readStar();
     printf("read ref file property\n");
     refStarFile->readProerty();
     dataStore->store(refStarFile, 1);
 
-    objStarFile = new StarFileFits(objFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold);
+    objStarFile = new StarFileFits(objFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold, gridSize);
     printf("read obj file\n");
     objStarFile->readStar();
     printf("read obj file property\n");
@@ -144,8 +150,13 @@ void mainSphere(char *refFile, char *objFile, char *outFile) {
     cms->match(refStarFile, objStarFile, areaBox);
     objStarFile->getMagDiff();
     objStarFile->fluxNorm();
+    objStarFile->tagFluxLargeVariation();
     objStarFile->wcsJudge(wcsext);
     dataStore->store(objStarFile, 0);
+}
+
+void setDefaultValue(){
+    
 }
 
 /**
@@ -287,6 +298,13 @@ int parsePara(int argc, char** argv) {
             printResult = 1;
         } else if (strcmp(argv[i], "-processInfo") == 0) {
             showProcessInfo = 1;
+        } else if (strcmp(argv[i], "-g") == 0) {
+            if (i + 1 >= argc || strlen(argv[i + 1]) == 0) {
+                printf("-g must follow a number\n");
+                return 0;
+            }
+            gridSize = atoi(argv[i + 1]);
+            i++;
         } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-help") == 0) {
             showHelp();
             return 0;
@@ -340,6 +358,7 @@ void showHelp() {
     printf("-cross:                     compare zone method with cross method, find the zone method omitted stars, and output to file\n");
     printf("-processInfo:               print process information\n");
     printf("-fluxSDTimes <number>:      the times of flux SD, use to filter matched star with mag\n");
+    printf("-g <number>:                the partition number in each side, used to calculate fluxratio within each partition, default is 1\n");
     printf("-h or -help:                show help\n");
     printf("-v or -version:             show version number\n");
     printf("example: \n");
@@ -408,12 +427,13 @@ void mainSphereTest(char *refFile, char *objFile, char *outFile) {
 
     int wcsext = 2;
     int magErrThreshold = 0.05; //used by getMagDiff
+    int gridSize = 1;
 
     StarFileFits *refStarFile, *objStarFile, *refnStarFile, *objnStarFile;
-    refStarFile = new StarFileFits(refFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold);
-    objStarFile = new StarFileFits(objFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold);
-    refnStarFile = new StarFileFits(refFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold);
-    objnStarFile = new StarFileFits(objFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold);
+    refStarFile = new StarFileFits(refFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold, gridSize);
+    objStarFile = new StarFileFits(objFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold, gridSize);
+    refnStarFile = new StarFileFits(refFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold, gridSize);
+    objnStarFile = new StarFileFits(objFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold, gridSize);
     refStarFile->readStar();
     objStarFile->readStar();
     refnStarFile->readStar();

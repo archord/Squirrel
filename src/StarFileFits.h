@@ -10,11 +10,25 @@
 
 #include "StarFile.h"
 
-struct AREABOX{
+class AreaBox {
+public:
     int top;
     int left;
     int right;
     int down;
+};
+
+class FluxPartition {
+public:
+    int number1;
+    int number2;
+    double *fluxRatios1;
+    double *fluxRatios2;
+    double magDiff;
+    double fluxRatioAverage;
+    double fluxRatioMedian;
+    double standardDeviation;
+    double timesOfSD;
 };
 
 class StarFileFits : public StarFile {
@@ -27,17 +41,22 @@ public:
     int wcsext;
     double airmass;
     double jd;
+
     double magDiff;
     double fluxRatioAverage;
     double fluxRatioMedian;
     double standardDeviation;
     int fluxRatioSDTimes; //abs(ratioRatio - flusRatioAverage) > flusRatioSD * standardDeviation;
 
-    float magErrThreshold;      //对magerr小于magErrThreshold的星计算magDiff
+    float magErrThreshold; //对magerr小于magErrThreshold的星计算magDiff
+
+    int gridSize;
+    FluxPartition *fluxPtn;
 
     StarFileFits();
     StarFileFits(char * fileName);
-    StarFileFits(char* fileName, float areaBox, int fitsHDU, int wcsext, int fluxRatioSDTimes, float magErrThreshold);
+    StarFileFits(char* fileName, float areaBox, int fitsHDU, int wcsext,
+            int fluxRatioSDTimes, float magErrThreshold, int gridSize);
     StarFileFits(const StarFileFits& orig);
     virtual ~StarFileFits();
 
@@ -51,11 +70,17 @@ public:
     void setFileName(char* fileName);
     void getMagDiff();
     void fluxNorm();
+    void tagFluxLargeVariation();
     void wcsJudge(int wcsext);
 private:
     double getFieldFromWCSFloat(char *fileName, int wcsext, char *field);
-    int isInAreaBox(int x, int y, struct AREABOX ab);
+    int isInAreaBox(int x, int y, AreaBox ab);
     void printerror(int status);
+    void setStandardDeviation();
+    void setFluxRatioMedian();
+    void setFluxRatioAverage();
+    void setMagDiff();
+    void freeFluxPtn();
 };
 
 #endif	/* STARFILEREF_H */

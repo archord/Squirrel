@@ -59,6 +59,9 @@ public:
     float fluxRatio; //
     char *line;
     int matchNum;
+    
+    int gridIdx;  //分区编号，计算fluxratio
+    int fluxVarTag;
 };
 
 class CMZone {

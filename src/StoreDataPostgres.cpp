@@ -81,7 +81,9 @@ void StoreDataPostgres::store(StarFileFits *starFile, int fileType) {
     storeCatlog(starFile, fileType);
     if (!fileType) {
         storeOT(starFile);
-        storeOTFlux(starFile);
+        if (starFile->fluxRatioSDTimes > 0) {
+            storeOTFlux(starFile);
+        }
     }
 
     PQfinish(conn);
@@ -373,23 +375,18 @@ void StoreDataPostgres::storeOTFlux(StarFileFits *starFile) {
 
     pgrst = PQexec(conn, sqlBuf);
     if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
-
-        double timesOfSD = starFile->fluxRatioSDTimes * starFile->standardDeviation;
         struct strBuffer *strBuf = initBinaryCopyBuf();
         int i = 0;
         CMStar *tStar = starFile->starList;
         while (tStar) {
-            if ((tStar->match != NULL) && (tStar->error < starFile->areaBox)) { // && (tSample->mage < 0.05)
-                double ratioAbs = fabs(tStar->fluxRatio - starFile->fluxRatioMedian);
-                if (ratioAbs > timesOfSD) {
-                    starToBinaryBufOt(tStar, strBuf);
-                    int copydatares = PQputCopyData(conn, strBuf->data, strBuf->cursor);
-                    if (copydatares == -1) {
-                        printf("copy error: %s\n", PQerrorMessage(conn));
-                    }
-                    strBuf->cursor = 0;
-                    i++;
+            if (tStar->fluxVarTag == 1) {
+                starToBinaryBufOt(tStar, strBuf);
+                int copydatares = PQputCopyData(conn, strBuf->data, strBuf->cursor);
+                if (copydatares == -1) {
+                    printf("copy error: %s\n", PQerrorMessage(conn));
                 }
+                strBuf->cursor = 0;
+                i++;
             }
             tStar = tStar->next;
         }
