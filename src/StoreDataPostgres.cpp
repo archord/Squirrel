@@ -256,7 +256,6 @@ void StoreDataPostgres::storeCatfileInfo(StarFileFits *starFile, int fileType) {
     }
 
     catid = atoi(PQgetvalue(pgrst, 0, 0));
-    //printf("catid = %d\n", catid);
     free(sqlBuf);
     PQclear(pgrst);
 }
@@ -285,7 +284,10 @@ void StoreDataPostgres::storeCatlog(StarFileFits *starFile, int fileType) {
     pgrst = PQexec(conn, sqlBuf);
     if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
 
-        struct strBuffer *strBuf = initBinaryCopyBuf();
+        struct strBuffer *strBuf = (struct strBuffer*) malloc(sizeof (struct strBuffer));
+        strBuf->data = (char*) malloc(LINE * sizeof (char));
+        strBuf->len = MAX_BUFFER;
+        initBinaryCopyBuf(strBuf);
         int i = 0;
         CMStar *tStar = starFile->starList;
         while (tStar) {
@@ -302,7 +304,8 @@ void StoreDataPostgres::storeCatlog(StarFileFits *starFile, int fileType) {
             }
             tStar = tStar->next;
         }
-        freeBinaryCopyBuf(strBuf);
+        free(strBuf);
+        free(strBuf->data);
         PQputCopyEnd(conn, NULL);
     } else {
         printf("copy error: %s\n", PQerrorMessage(conn));
@@ -331,8 +334,10 @@ void StoreDataPostgres::storeOT(StarFileFits *starFile) {
     pgrst = PQexec(conn, sqlBuf);
     if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
 
-        double timesOfSD = starFile->fluxRatioSDTimes * starFile->standardDeviation;
-        struct strBuffer *strBuf = initBinaryCopyBuf();
+        struct strBuffer *strBuf = (struct strBuffer*) malloc(sizeof (struct strBuffer));
+        strBuf->data = (char*) malloc(LINE * sizeof (char));
+        strBuf->len = MAX_BUFFER;
+        initBinaryCopyBuf(strBuf);
         int i = 0;
         CMStar *tStar = starFile->starList;
         while (tStar) {
@@ -347,7 +352,8 @@ void StoreDataPostgres::storeOT(StarFileFits *starFile) {
             }
             tStar = tStar->next;
         }
-        freeBinaryCopyBuf(strBuf);
+        free(strBuf);
+        free(strBuf->data);
         PQputCopyEnd(conn, NULL);
     } else {
         printf("copy error: %s\n", PQerrorMessage(conn));
@@ -375,7 +381,10 @@ void StoreDataPostgres::storeOTFlux(StarFileFits *starFile) {
 
     pgrst = PQexec(conn, sqlBuf);
     if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
-        struct strBuffer *strBuf = initBinaryCopyBuf();
+        struct strBuffer *strBuf = (struct strBuffer*) malloc(sizeof (struct strBuffer));
+        strBuf->data = (char*) malloc(LINE * sizeof (char));
+        strBuf->len = MAX_BUFFER;
+        initBinaryCopyBuf(strBuf);
         int i = 0;
         CMStar *tStar = starFile->starList;
         while (tStar) {
@@ -390,7 +399,8 @@ void StoreDataPostgres::storeOTFlux(StarFileFits *starFile) {
             }
             tStar = tStar->next;
         }
-        freeBinaryCopyBuf(strBuf);
+        free(strBuf);
+        free(strBuf->data);
         PQputCopyEnd(conn, NULL);
     } else {
         printf("copy error: %s\n", PQerrorMessage(conn));
@@ -399,14 +409,10 @@ void StoreDataPostgres::storeOTFlux(StarFileFits *starFile) {
     free(sqlBuf);
 }
 
-struct strBuffer * StoreDataPostgres::initBinaryCopyBuf() {
+void StoreDataPostgres::initBinaryCopyBuf(struct strBuffer *strBuf) {
 
     char *sendHeader = "PGCOPY\n\377\r\n\0";
     unsigned int zero = '\0';
-
-    struct strBuffer *strBuf = (struct strBuffer*) malloc(sizeof (struct strBuffer));
-    strBuf->data = (char*) malloc(LINE * sizeof (char));
-    strBuf->len = MAX_BUFFER;
 
     strBuf->cursor = 0;
     memcpy(strBuf->data, sendHeader, 11);
@@ -483,11 +489,6 @@ void StoreDataPostgres::starToBinaryBufOt(CMStar * tStar, struct strBuffer *strB
     addFloat8(strBuf, tStar->pixx1);
     addFloat8(strBuf, tStar->pixy1);
     addFloat8(strBuf, tStar->fluxRatio);
-}
-
-void StoreDataPostgres::freeBinaryCopyBuf(struct strBuffer *strBuf) {
-    free(strBuf);
-    free(strBuf->data);
 }
 
 void StoreDataPostgres::addInt16(struct strBuffer* strBuf, unsigned short i) {

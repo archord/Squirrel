@@ -144,7 +144,6 @@ void mainSphere(char *refFile, char *objFile, char *outFile) {
     objStarFile->readStar();
     objStarFile->readProerty();
 
-
     CrossMatchSphere *cms = new CrossMatchSphere();
     //目前minZoneLength和searchRadius没有考虑
     cms->match(refStarFile, objStarFile, areaBox);

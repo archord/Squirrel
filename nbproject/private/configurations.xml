@@ -43,7 +43,7 @@
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
-        <developmentServer>gwac@190.168.1.25:22</developmentServer>
+        <developmentServer>localhost</developmentServer>
         <platform>2</platform>
       </toolsSet>
       <dbx_gdbdebugger version="1">
@@ -64,8 +64,9 @@
       <runprofile version="9">
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -method sphere -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1 -grid 2</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <runcommand>"${OUTPUT_PATH}"  -method sphere -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1 -grid 2</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>

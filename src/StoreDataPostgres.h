@@ -58,8 +58,7 @@ private:
     void addInt64(struct strBuffer* strBuf, long int li);
     void addFloat4(struct strBuffer* strBuf, float f);
     void addFloat8(struct strBuffer* strBuf, double d);
-    struct strBuffer *initBinaryCopyBuf();
-    void freeBinaryCopyBuf(struct strBuffer *strBuf);
+    void initBinaryCopyBuf(struct strBuffer *strBuf);
     void starToBinaryBuf(CMStar * tStar, int fileType, struct strBuffer *strBuf);
     void starToBinaryBufOt(CMStar * tStar, struct strBuffer *strBuf);
 };

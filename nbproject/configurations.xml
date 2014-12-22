@@ -121,6 +121,13 @@
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>library/astrometry.net-0.38/include</pElem>
+            <pElem>library/cfitsio/include</pElem>
+            <pElem>library/wcstools-3.8.5/include</pElem>
+            <pElem>../CrossMatchLibrary/src</pElem>
+            <pElem>/usr/include/postgresql</pElem>
+          </incDir>
         </ccTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
@@ -128,6 +135,14 @@
         <asmTool>
           <developmentMode>5</developmentMode>
         </asmTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>library/astrometry.net-0.38/lib</pElem>
+            <pElem>library/cfitsio/lib</pElem>
+            <pElem>library/wcstools-3.8.5/lib</pElem>
+          </linkerAddLib>
+          <commandLine>-lcfitsio -lm -lpq -lanutils -lpthread -lwcs -lbackend</commandLine>
+        </linkerTool>
       </compileType>
       <item path="../Squirrel/src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
