@@ -34,7 +34,7 @@ extern "C" {
 
 StarFileFits::StarFileFits() {
 
-    showProcessInfo = 1;
+    showProcessInfo = 0;
     areaBox = 0.0;
     airmass = 0.0;
     jd = 0.0;
@@ -48,7 +48,7 @@ StarFileFits::StarFileFits() {
 
 StarFileFits::StarFileFits(char* fileName) : StarFile(fileName) {
 
-    showProcessInfo = 1;
+    showProcessInfo = 0;
     areaBox = 0.0;
     airmass = 0.0;
     jd = 0.0;
@@ -63,7 +63,7 @@ StarFileFits::StarFileFits(char* fileName) : StarFile(fileName) {
 StarFileFits::StarFileFits(char* fileName, float areaBox, int fitsHDU, int wcsext,
         int fluxRatioSDTimes, float magErrThreshold, int gridSize) {
 
-    this->showProcessInfo = 1;
+    this->showProcessInfo = 0;
     this->airmass = 0.0;
     this->jd = 0.0;
     this->magDiff = 0.0;
@@ -163,11 +163,7 @@ void StarFileFits::readStar(char * fileName) {
     //ttype[ii] = (char *) malloc(FLEN_VALUE);  /* max label length = 69 */
 
 
-    if (hdutype == ASCII_TBL && showProcessInfo)
-        printf("\nReading ASCII table in HDU %d:\n", hdunum);
-    else if (hdutype == BINARY_TBL && showProcessInfo)
-        printf("\nReading binary table in HDU %d:\n", hdunum);
-    else if (showProcessInfo) {
+    if (hdutype != ASCII_TBL && hdutype != BINARY_TBL) {
         printf("Error: this HDU is not an ASCII or binary table\n");
         printerror(status);
         return;
@@ -373,11 +369,7 @@ double StarFileFits::getFieldFromWCSFloat(char *fileName, int wcsext, char *fiel
     }
 
 
-    if (hdutype == ASCII_TBL && showProcessInfo)
-        printf("\nReading ASCII table in HDU %d:\n", hdunum);
-    else if (hdutype == BINARY_TBL && showProcessInfo)
-        printf("\nReading binary table in HDU %d:\n", hdunum);
-    else if (showProcessInfo) {
+    if (hdutype != ASCII_TBL && hdutype != BINARY_TBL) {
         printf("Error: this HDU is not an ASCII or binary table\n");
         printerror(status);
         return 0.0;
@@ -452,8 +444,8 @@ void StarFileFits::getMagDiff() {
     int minDeci = floor(minDecf);
     int maxDeci = ceil(maxDecf);
 
-    float raGridLen = (maxRai - minRai) / gridSize;
-    float decGridLen = (maxDeci - minDeci) / gridSize;
+    float raGridLen = (maxRai - minRai) *1.0 / gridSize;
+    float decGridLen = (maxDeci - minDeci) *1.0 / gridSize;
 
     tStar = starList;
     //统计每个分区中星的个数
@@ -461,6 +453,8 @@ void StarFileFits::getMagDiff() {
         int xIdx = (tStar->alpha - minRai) / raGridLen;
         int yIdx = (tStar->delta - minDeci) / decGridLen;
         tStar->gridIdx = yIdx * gridSize + xIdx;
+        if (tStar->gridIdx > gridSize * gridSize - 1)
+            printf("gridIdx=%d\n", tStar->gridIdx);
         if ((tStar->match != NULL) && (tStar->error < areaBox)) {
             if (tStar->mage < magErrThreshold)
                 fluxPtn[tStar->gridIdx].number1++;
@@ -478,15 +472,14 @@ void StarFileFits::getMagDiff() {
         }
     }
 
-    int i = 0, j = 0;
     tStar = starList;
     //对分区数组赋值
     while (tStar) {
         if ((tStar->match != NULL) && (tStar->error < areaBox)) {
             tStar->fluxRatio = pow10(-0.4 * (tStar->match->mag - tStar->mag));
             if (tStar->mage < magErrThreshold)
-                fluxPtn[tStar->gridIdx].fluxRatios1[i++] = tStar->fluxRatio;
-            fluxPtn[tStar->gridIdx].fluxRatios2[j++] = tStar->fluxRatio;
+                fluxPtn[tStar->gridIdx].fluxRatios1[fluxPtn[tStar->gridIdx].curIdx1++] = tStar->fluxRatio;
+            fluxPtn[tStar->gridIdx].fluxRatios2[fluxPtn[tStar->gridIdx].curIdx2++] = tStar->fluxRatio;
         }
         tStar = tStar->next;
     }
@@ -586,11 +579,7 @@ void StarFileFits::wcsJudge(int wcsext) {
         return;
     }
 
-    if (hdutype == ASCII_TBL && showProcessInfo)
-        printf("\nReading ASCII table in HDU %d:\n", hdunum);
-    else if (hdutype == BINARY_TBL && showProcessInfo)
-        printf("\nReading binary table in HDU %d:\n", hdunum);
-    else if (showProcessInfo) {
+    if (hdutype != ASCII_TBL && hdutype != BINARY_TBL) {
         printf("Error: this HDU is not an ASCII or binary table\n");
         printerror(status);
         return;

@@ -71,7 +71,7 @@ public:
 };
 
 #define FIND_MOST_LOW
-#define PRINT_CM_DETAIL
+#define PRINT_CM_DETAIL1
 
 #define TREE_NODE_LENGTH 64800		//the totle number of tree node (360*180)
 #define AREA_WIDTH 360

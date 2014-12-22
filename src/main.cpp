@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
         showHelp();
         return 0;
     }
-    
+
     setDefaultValue();
 
     method = PLANE_METHOD;
@@ -126,26 +126,26 @@ void mainPlane(char *refFile, char *objFile, char *outFile) {
  */
 void mainSphere(char *refFile, char *objFile, char *outFile) {
 
+    printf("starting sphere corss match...\n");
+
+    long start, end;
+    start = clock();
+    
     int wcsext = 2;
     float magErrThreshold = 0.05; //used by getMagDiff
 
     StarFileFits *refStarFile, *objStarFile;
     refStarFile = new StarFileFits(refFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold, gridSize);
-    printf("read ref file\n");
     refStarFile->readStar();
-    printf("read ref file property\n");
     refStarFile->readProerty();
     dataStore->store(refStarFile, 1);
 
     objStarFile = new StarFileFits(objFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold, gridSize);
-    printf("read obj file\n");
     objStarFile->readStar();
-    printf("read obj file property\n");
     objStarFile->readProerty();
 
 
     CrossMatchSphere *cms = new CrossMatchSphere();
-    printf("match\n");
     //目前minZoneLength和searchRadius没有考虑
     cms->match(refStarFile, objStarFile, areaBox);
     objStarFile->getMagDiff();
@@ -153,10 +153,13 @@ void mainSphere(char *refFile, char *objFile, char *outFile) {
     objStarFile->tagFluxLargeVariation();
     objStarFile->wcsJudge(wcsext);
     dataStore->store(objStarFile, 0);
+    
+    end = clock();
+    printf("total time is: %fs\n", (end - start)*1.0 / ONESECOND);
 }
 
-void setDefaultValue(){
-    
+void setDefaultValue() {
+
 }
 
 /**
@@ -298,9 +301,9 @@ int parsePara(int argc, char** argv) {
             printResult = 1;
         } else if (strcmp(argv[i], "-processInfo") == 0) {
             showProcessInfo = 1;
-        } else if (strcmp(argv[i], "-g") == 0) {
+        } else if (strcmp(argv[i], "-g") == 0 || strcmp(argv[i], "-grid") == 0) {
             if (i + 1 >= argc || strlen(argv[i + 1]) == 0) {
-                printf("-g must follow a number\n");
+                printf("-g or -grid must follow a number\n");
                 return 0;
             }
             gridSize = atoi(argv[i + 1]);

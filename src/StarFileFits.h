@@ -20,6 +20,8 @@ public:
 
 class FluxPartition {
 public:
+    int curIdx1;
+    int curIdx2;
     int number1;
     int number2;
     double *fluxRatios1;
