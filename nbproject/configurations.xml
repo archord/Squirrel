@@ -37,6 +37,7 @@
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
+      <itemPath>Makefile1</itemPath>
     </logicalFolder>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
@@ -54,7 +55,6 @@
             <pElem>library/astrometry.net-0.38/include</pElem>
             <pElem>library/cfitsio/include</pElem>
             <pElem>library/wcstools-3.8.5/include</pElem>
-            <pElem>../CrossMatchLibrary/src</pElem>
             <pElem>/usr/include/postgresql</pElem>
           </incDir>
         </ccTool>
@@ -125,7 +125,6 @@
             <pElem>library/astrometry.net-0.38/include</pElem>
             <pElem>library/cfitsio/include</pElem>
             <pElem>library/wcstools-3.8.5/include</pElem>
-            <pElem>../CrossMatchLibrary/src</pElem>
             <pElem>/usr/include/postgresql</pElem>
           </incDir>
         </ccTool>

@@ -1,0 +1,19 @@
+PERFIX = ./library
+WCSTOOL = ${PERFIX}/wcstools-3.8.5
+ASTROMETRY = ${PERFIX}/astrometry.net-0.38
+CFITSIO = ${PERFIX}/cfitsio
+
+POSTGRESQL = /usr/include/postgresql
+
+LDIR = -L ${WCSTOOL}/lib  -L ${ASTROMETRY}/lib  -L ${CFITSIO}/lib
+IDIR = -I ${WCSTOOL}/include  -I ${ASTROMETRY}/include  -I ${CFITSIO}/include -I /usr/include/postgresql
+LIBS = -lcfitsio -lm -lpq -lanutils -lpthread -lwcs -lbackend
+
+ALL:crossmatch
+
+crossmatch:
+	g++ ${IDIR} src/CrossMatch.cpp src/CrossMatchSphere.cpp src/Partition.cpp src/PartitionSphere.cpp src/StarFile.cpp src/StarFileFits.cpp src/StoreDataPostgres.cpp src/cmutils.cpp src/main.cpp -o crossmatch  ${LDIR} ${LIBS}
+
+clean:
+	rm -rf *.o crossmatch
+
