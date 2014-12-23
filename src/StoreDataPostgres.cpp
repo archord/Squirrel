@@ -251,7 +251,7 @@ void StoreDataPostgres::storeCatfileInfo(StarFileFits *starFile, int fileType) {
             free(sqlBuf);
             return;
         }
-    } else {
+    } else if(!fileType){
         printf("%s already in table %s! please check!\n", starFile->fileName, catfile_table);
     }
 
@@ -434,7 +434,11 @@ void StoreDataPostgres::starToBinaryBuf(CMStar * tStar, int fileType, struct str
     unsigned short fieldNum = 22;
     addInt16(strBuf, fieldNum); //column number, when add or delete colume, must change this number
     addInt64(strBuf, tStar->id);
-    addInt64(strBuf, tStar->crossid);
+    if (fileType) {
+        addInt64(strBuf, tStar->crossid);
+    } else {
+        addInt64(strBuf, tStar->match->id);
+    }
     addInt64(strBuf, catid);
     addFloat8(strBuf, tStar->magnorm);
     addFloat8(strBuf, tStar->alpha);
