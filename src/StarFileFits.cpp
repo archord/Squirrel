@@ -424,17 +424,17 @@ void StarFileFits::getMagDiff() {
     float maxDecf = -90.0;
     CMStar *tStar = starList;
     while (tStar) {
-        if (tStar->alpha < minRaf) {
-            minRaf = tStar->alpha;
+        if (tStar->pixx < minRaf) {
+            minRaf = tStar->pixx;
         }
-        if (tStar->alpha > maxRaf) {
-            maxRaf = tStar->alpha;
+        if (tStar->pixx > maxRaf) {
+            maxRaf = tStar->pixx;
         }
-        if (tStar->delta < minDecf) {
-            minDecf = tStar->delta;
+        if (tStar->pixy < minDecf) {
+            minDecf = tStar->pixy;
         }
-        if (tStar->delta > maxDecf) {
-            maxDecf = tStar->delta;
+        if (tStar->pixy > maxDecf) {
+            maxDecf = tStar->pixy;
         }
         tStar = tStar->next;
     }
@@ -450,8 +450,8 @@ void StarFileFits::getMagDiff() {
     tStar = starList;
     //统计每个分区中星的个数
     while (tStar) {
-        int xIdx = (tStar->alpha - minRai) / raGridLen;
-        int yIdx = (tStar->delta - minDeci) / decGridLen;
+        int xIdx = (tStar->pixx - minRai) / raGridLen;
+        int yIdx = (tStar->pixy - minDeci) / decGridLen;
         tStar->gridIdx = yIdx * gridSize + xIdx;
         if (tStar->gridIdx > gridSize * gridSize - 1)
             printf("gridIdx=%d\n", tStar->gridIdx);
