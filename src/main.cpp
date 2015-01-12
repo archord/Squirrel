@@ -350,7 +350,7 @@ int parsePara(int argc, char** argv) {
       showProcessInfo = 1;
     } else if (strcmp(argv[i], "-g") == 0 || strcmp(argv[i], "-grid") == 0) {
       if (i + 1 >= argc || strlen(argv[i + 1]) == 0) {
-        printf("-g or -grid must follow number*number\n");
+        printf("-g or -grid must follow number,number\n");
         return 0;
       }
       if (2 != sscanf(argv[i + 1], "%d*%d", &gridX, &gridY)) {
@@ -411,12 +411,12 @@ void showHelp() {
   printf("-cross:                     compare zone method with cross method, find the zone method omitted stars, and output to file\n");
   printf("-processInfo:               print process information\n");
   printf("-fluxSDTimes <number>:      the times of flux SD, use to filter matched star with mag\n");
-  printf("-g <Xnumber*Ynumber>:       the partition number in X and Y direction, used to calculate fluxratio, default is 1*1\n");
+  printf("-g <Xnumber,Ynumber>:       the partition number in X and Y direction, used to calculate fluxratio, default is 1,1\n");
   printf("-h or -help:                show help\n");
   printf("-v or -version:             show version number\n");
   printf("example: \n");
-  printf("\t1: crossmatch -method sphere -g 2*2 -errorRadius 0.006(20 arcsec) -searchRadius 0.018 -fitsHDU 2 -ref reference.cat -sample sample.cat -output output.cat -processInfo\n");
-  printf("\t2: crossmatch -method plane  -g 2*2 -errorRadius 10 -searchRadius 30 -width 3096 -height 3096 -fitsHDU 2 -ref reference.cat -sample sample.cat -output output.cat -processInfo\n");
+  printf("\t1: crossmatch -method sphere -g 2,2 -errorRadius 0.006(20 arcsec) -searchRadius 0.018 -fitsHDU 2 -ref reference.cat -sample sample.cat -output output.cat -processInfo\n");
+  printf("\t2: crossmatch -method plane  -g 2,2 -errorRadius 10 -searchRadius 30 -width 3096 -height 3096 -fitsHDU 2 -ref reference.cat -sample sample.cat -output output.cat -processInfo\n");
   //printf("Notes: default area box is 0.005556 degree, output all result, not print to terminal, not print process information, not compare the result with cross method\n");
 }
 
