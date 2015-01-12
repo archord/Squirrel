@@ -61,7 +61,7 @@ StarFileFits::StarFileFits(char* fileName) : StarFile(fileName) {
 }
 
 StarFileFits::StarFileFits(char* fileName, float areaBox, int fitsHDU, int wcsext,
-        int fluxRatioSDTimes, float magErrThreshold, int gridSize) {
+        int fluxRatioSDTimes, float magErrThreshold, int gridX, int gridY) {
 
     this->showProcessInfo = 0;
     this->airmass = 0.0;
@@ -77,7 +77,8 @@ StarFileFits::StarFileFits(char* fileName, float areaBox, int fitsHDU, int wcsex
     this->wcsext = wcsext;
     this->fluxRatioSDTimes = fluxRatioSDTimes;
     this->magErrThreshold = magErrThreshold;
-    this->gridSize = gridSize;
+    this->gridX = gridX;
+    this->gridY = gridY;
 }
 
 StarFileFits::StarFileFits(const StarFileFits& orig) : StarFile(orig) {
@@ -247,8 +248,8 @@ void StarFileFits::readStar(char * fileName) {
         tStar[i].match = NULL;
         tStar[i].error = 100.0;
 
-        tStar[i].catid = 0.0;
-        tStar[i].crossid = 0.0;
+        tStar[i].catid = 0;
+        tStar[i].crossid = 0;
         tStar[i].magnorm = 0.0;
         tStar[i].magcalib = 0.0;
         tStar[i].magcalibe = 0.0;
@@ -283,8 +284,8 @@ void StarFileFits::readStar(char * fileName) {
     tStar[nelem - 1].match = NULL;
     tStar[nelem - 1].error = 100.0;
 
-    tStar[nelem - 1].catid = 0.0;
-    tStar[nelem - 1].crossid = 0.0;
+    tStar[nelem - 1].catid = 0;
+    tStar[nelem - 1].crossid = 0;
     tStar[nelem - 1].magnorm = 0.0;
     tStar[nelem - 1].magcalib = 0.0;
     tStar[nelem - 1].magcalibe = 0.0;
@@ -416,44 +417,44 @@ void StarFileFits::getMagDiff() {
 
     if (starList == NULL) return;
 
-    fluxPtn = (FluxPartition*) malloc(sizeof (FluxPartition) * gridSize * gridSize);
-    memset(fluxPtn, 0, sizeof (FluxPartition) * gridSize * gridSize);
-    float minRaf = 360.0;
-    float maxRaf = 0.0;
-    float minDecf = 90.0;
-    float maxDecf = -90.0;
+    fluxPtn = (FluxPartition*) malloc(sizeof (FluxPartition) * gridX * gridY);
+    memset(fluxPtn, 0, sizeof (FluxPartition) * gridX * gridY);
+    float minXf = 360.0;
+    float maxXf = 0.0;
+    float minYf = 90.0;
+    float maxYf = -90.0;
     CMStar *tStar = starList;
     while (tStar) {
-        if (tStar->pixx < minRaf) {
-            minRaf = tStar->pixx;
+        if (tStar->pixx < minXf) {
+            minXf = tStar->pixx;
         }
-        if (tStar->pixx > maxRaf) {
-            maxRaf = tStar->pixx;
+        if (tStar->pixx > maxXf) {
+            maxXf = tStar->pixx;
         }
-        if (tStar->pixy < minDecf) {
-            minDecf = tStar->pixy;
+        if (tStar->pixy < minYf) {
+            minYf = tStar->pixy;
         }
-        if (tStar->pixy > maxDecf) {
-            maxDecf = tStar->pixy;
+        if (tStar->pixy > maxYf) {
+            maxYf = tStar->pixy;
         }
         tStar = tStar->next;
     }
 
-    int minRai = floor(minRaf);
-    int maxRai = ceil(maxRaf);
-    int minDeci = floor(minDecf);
-    int maxDeci = ceil(maxDecf);
+    int minXi = floor(minXf);
+    int maxXi = ceil(maxXf);
+    int minYi = floor(minYf);
+    int maxYi = ceil(maxYf);
 
-    float raGridLen = (maxRai - minRai) *1.0 / gridSize;
-    float decGridLen = (maxDeci - minDeci) *1.0 / gridSize;
+    float raGridLen = (maxXi - minXi) *1.0 / gridX;
+    float decGridLen = (maxYi - minYi) *1.0 / gridY;
 
     tStar = starList;
     //统计每个分区中星的个数
     while (tStar) {
-        int xIdx = (tStar->pixx - minRai) / raGridLen;
-        int yIdx = (tStar->pixy - minDeci) / decGridLen;
-        tStar->gridIdx = yIdx * gridSize + xIdx;
-        if (tStar->gridIdx > gridSize * gridSize - 1)
+        int xIdx = (tStar->pixx - minXi) / raGridLen;
+        int yIdx = (tStar->pixy - minYi) / decGridLen;
+        tStar->gridIdx = yIdx * gridX + xIdx;
+        if (tStar->gridIdx > gridX * gridY - 1)
             printf("gridIdx=%d\n", tStar->gridIdx);
         if ((tStar->match != NULL) && (tStar->error < areaBox)) {
             if (tStar->mage < magErrThreshold)
@@ -464,9 +465,9 @@ void StarFileFits::getMagDiff() {
     }
 
     //为分区数组分配空间
-    for (int i = 0; i < gridSize; i++) {
-        for (int j = 0; j < gridSize; j++) {
-            int idx = i * gridSize + j;
+    for (int i = 0; i < gridY; i++) {
+        for (int j = 0; j < gridX; j++) {
+            int idx = i * gridX + j;
             fluxPtn[idx].fluxRatios1 = (double*) malloc(fluxPtn[idx].number1 * sizeof (double));
             fluxPtn[idx].fluxRatios2 = (double*) malloc(fluxPtn[idx].number2 * sizeof (double));
         }
@@ -484,9 +485,9 @@ void StarFileFits::getMagDiff() {
         tStar = tStar->next;
     }
 
-    for (int i = 0; i < gridSize; i++) {
-        for (int j = 0; j < gridSize; j++) {
-            int idx = i * gridSize + j;
+    for (int i = 0; i < gridY; i++) {
+        for (int j = 0; j < gridX; j++) {
+            int idx = i * gridX + j;
             fluxPtn[idx].fluxRatioAverage = getAverage(fluxPtn[idx].fluxRatios2, fluxPtn[idx].number2);
             fluxPtn[idx].standardDeviation =
                     getStandardDeviation(fluxPtn[idx].fluxRatios2, fluxPtn[idx].number2, fluxPtn[idx].fluxRatioAverage);
@@ -506,9 +507,9 @@ void StarFileFits::getMagDiff() {
 
 void StarFileFits::freeFluxPtn() {
 
-    for (int i = 0; i < gridSize; i++) {
-        for (int j = 0; j < gridSize; j++) {
-            int idx = i * gridSize + j;
+    for (int i = 0; i < gridY; i++) {
+        for (int j = 0; j < gridX; j++) {
+            int idx = i * gridX + j;
             free(fluxPtn[idx].fluxRatios1);
             free(fluxPtn[idx].fluxRatios2);
         }
@@ -550,6 +551,42 @@ void StarFileFits::tagFluxLargeVariation() {
     }
 }
 
+/**
+ * 图像X，Y匹配，判断目标星的X，Y坐标是否越过模板图像的边界
+ */
+void StarFileFits::judgeInAreaPlane() {
+
+    AreaBox ab;
+    ab.left = 0;
+    ab.down = 0;
+    ab.top = fieldHeight;
+    ab.right = fieldWidth;
+
+    int notMatched = 0;
+    int outArea = 0;
+
+    CMStar *tStar = starList;
+    while (tStar) {
+        if (tStar->error >= areaBox) {
+            if (isInAreaBox(tStar->pixx, tStar->pixy, ab)) {
+                tStar->inarea = 1;
+            } else {
+                tStar->inarea = -1;
+                outArea++;
+            }
+            notMatched++;
+        }
+        tStar = tStar->next;
+    }
+    if (showProcessInfo) {
+        printf("\nnot matched: %d, out area: %d\n", notMatched, outArea);
+    }
+}
+
+/**
+ * 图像天球坐标匹配，判断目标星的X，Y坐标是否越过模板图像的边界，XY的值根据模板文件wcs头转换而来
+ * @param wcsext wcs头在fits文件中的位置
+ */
 void StarFileFits::wcsJudge(int wcsext) {
 
     fitsfile *fptr; /* pointer to the FITS file, defined in fitsio.h */
@@ -657,48 +694,48 @@ void StarFileFits::setStandardDeviation() {
     if (NULL == fluxPtn)
         return;
     float total = 0;
-    for (int i = 0; i < gridSize; i++) {
-        for (int j = 0; j < gridSize; j++) {
-            total += fluxPtn[i * gridSize + j].standardDeviation;
+    for (int i = 0; i < gridY; i++) {
+        for (int j = 0; j < gridX; j++) {
+            total += fluxPtn[i * gridX + j].standardDeviation;
         }
     }
-    standardDeviation = total / (gridSize * gridSize);
+    standardDeviation = total / (gridX * gridY);
 }
 
 void StarFileFits::setFluxRatioMedian() {
     if (NULL == fluxPtn)
         return;
     float total = 0;
-    for (int i = 0; i < gridSize; i++) {
-        for (int j = 0; j < gridSize; j++) {
-            total += fluxPtn[i * gridSize + j].fluxRatioMedian;
+    for (int i = 0; i < gridY; i++) {
+        for (int j = 0; j < gridX; j++) {
+            total += fluxPtn[i * gridX + j].fluxRatioMedian;
         }
     }
-    fluxRatioMedian = total / (gridSize * gridSize);
+    fluxRatioMedian = total / (gridX * gridY);
 }
 
 void StarFileFits::setFluxRatioAverage() {
     if (NULL == fluxPtn)
         return;
     float total = 0;
-    for (int i = 0; i < gridSize; i++) {
-        for (int j = 0; j < gridSize; j++) {
-            total += fluxPtn[i * gridSize + j].fluxRatioAverage;
+    for (int i = 0; i < gridY; i++) {
+        for (int j = 0; j < gridX; j++) {
+            total += fluxPtn[i * gridX + j].fluxRatioAverage;
         }
     }
-    fluxRatioAverage = total / (gridSize * gridSize);
+    fluxRatioAverage = total / (gridX * gridY);
 }
 
 void StarFileFits::setMagDiff() {
     if (NULL == fluxPtn)
         return;
     float total = 0;
-    for (int i = 0; i < gridSize; i++) {
-        for (int j = 0; j < gridSize; j++) {
-            total += fluxPtn[i * gridSize + j].magDiff;
+    for (int i = 0; i < gridY; i++) {
+        for (int j = 0; j < gridX; j++) {
+            total += fluxPtn[i * gridX + j].magDiff;
         }
     }
-    magDiff = total / (gridSize * gridSize);
+    magDiff = total / (gridX * gridY);
 }
 
 int StarFileFits::isInAreaBox(int x, int y, AreaBox ab) {
@@ -718,4 +755,12 @@ void StarFileFits::printerror(int status) {
         exit(status); /* terminate the program, returning error status */
     }
     return;
+}
+
+void StarFileFits::setFieldHeight(float fieldHeight) {
+  this->fieldHeight = fieldHeight;
+}
+
+void StarFileFits::setFieldWidth(float fieldWidth) {
+  this->fieldWidth = fieldWidth;
 }

@@ -197,7 +197,7 @@ void CrossMatchSphere::compareResult(StarFile *objStarFile, StarFile *objStarFil
     fprintf(fp, "X1,Y1,X2,Y2 is orig X and Y position of stars\n");
     fprintf(fp, "X1m,Y1m,X2m,Y2m is matched X and Y position of stars\n");
     fprintf(fp, "pos1,pos2 is the two method's match distance\n");
-    fprintf(fp, "the following list is leaked star of partition method\n");
+    fprintf(fp, "the following list is leaked star of partition method, total %d\n", g);
     fprintf(fp, "X1\tY1\tX2\tY2\tX1m\tY1m\tX2m\tY2m\terr1\terr2\n");
     tStar1 = objStarFile->starList;
     tStar2 = objStarFileNoPtn->starList;
@@ -213,7 +213,7 @@ void CrossMatchSphere::compareResult(StarFile *objStarFile, StarFile *objStarFil
         tStar2 = tStar2->next;
     }
 
-    fprintf(fp, "the following list is OT\n");
+    fprintf(fp, "the following list is OT, total %d\n", k-g);
     fprintf(fp, "X1\tY1\tX2\tY2\tX1m\tY1m\tX2m\tY2m\terr1\terr2\n");
     tStar1 = objStarFile->starList;
     tStar2 = objStarFileNoPtn->starList;

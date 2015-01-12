@@ -17,8 +17,8 @@ protected:
     float maxy;
     float minx;
     float miny;
-    float fieldWidth; //星表视场的宽度
-    float fieldHeight; //星表视场的高度
+    float fieldWidth; //星表视场的宽度，如果使用时不设置，则程序会自动计算，maxX-minX
+    float fieldHeight; //星表视场的高度，如果使用时不设置，则程序会自动计算，maxY-minY
 
     float errRadius; //两颗星匹配的最小距离
     float searchRadius; //搜索匹配分区时的矩形搜索区域（边长为2*searchRadius）
@@ -49,6 +49,10 @@ public:
     float getErrRadius() const;
     void setMinZoneLength(float minZoneLength);
     float getMinZoneLength() const;
+    void setFieldHeight(float fieldHeight);
+    void setFieldWidth(float fieldWidth);
+    float getFieldHeight() const;
+    float getFieldWidth() const;
 
 protected:
     CMStar *searchSimilarStar(long zoneIdx, CMStar *star);
