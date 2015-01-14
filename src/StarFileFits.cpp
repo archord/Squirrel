@@ -274,11 +274,11 @@ void StarFileFits::readStar(char * fileName) {
     tStar[nelem - 1].fwhm = fwhm[nelem - 1];
     tStar[nelem - 1].vignet = vignet[nelem - 1];
     if (colNum == 16) {
-        tStar[nelem].pixx1 = pixx1[nelem - 1];
-        tStar[nelem].pixy1 = pixy1[nelem - 1];
+        tStar[nelem - 1].pixx1 = pixx1[nelem - 1];
+        tStar[nelem - 1].pixy1 = pixy1[nelem - 1];
     } else {
-        tStar[nelem].pixx1 = pixx[nelem - 1];
-        tStar[nelem].pixy1 = pixy[nelem - 1];
+        tStar[nelem - 1].pixx1 = pixx[nelem - 1];
+        tStar[nelem - 1].pixy1 = pixy[nelem - 1];
     }
     tStar[nelem - 1].next = NULL;
     tStar[nelem - 1].match = NULL;

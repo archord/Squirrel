@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
 
 void mainPlane(char *refFile, char *objFile, char *outFile) {
 
-  printf("starting sphere corss match...\n");
+  printf("starting plane cross match...\n");
 
   long start, end;
   start = clock();
@@ -178,7 +178,7 @@ void mainPlane(char *refFile, char *objFile, char *outFile) {
  */
 void mainSphere(char *refFile, char *objFile, char *outFile) {
 
-  printf("starting sphere corss match...\n");
+  printf("starting sphere cross match...\n");
 
   long start, end;
   start = clock();
@@ -353,7 +353,7 @@ int parsePara(int argc, char** argv) {
         printf("-g or -grid must follow number,number\n");
         return 0;
       }
-      if (2 != sscanf(argv[i + 1], "%d*%d", &gridX, &gridY)) {
+      if (2 != sscanf(argv[i + 1], "%d,%d", &gridX, &gridY)) {
         printf("-g or -grid must follow number*number\n");
         return 0;
       }
