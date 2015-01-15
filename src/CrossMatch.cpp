@@ -29,6 +29,7 @@ CrossMatch::CrossMatch(const CrossMatch& orig) {
 }
 
 CrossMatch::~CrossMatch() {
+  freeAllMemory();
 }
 
 void CrossMatch::match(char *refName, char *objName, float errorBox) {
@@ -113,15 +114,15 @@ void CrossMatch::matchNoPartition(StarFile *refStarFileNoPtn, StarFile *objStarF
 void CrossMatch::freeAllMemory() {
 
   if (NULL != refStarFile)
-    refStarFile->~StarFile();
+    delete refStarFile;
   if (NULL != objStarFile)
-    objStarFile->~StarFile();
+    delete objStarFile;
   if (NULL != refStarFileNoPtn)
-    refStarFileNoPtn->~StarFile();
+    delete refStarFileNoPtn;
   if (NULL != objStarFileNoPtn)
-    objStarFileNoPtn->~StarFile();
+    delete objStarFileNoPtn;
   if (NULL != zones) {
-    zones->freeZoneArray();
+    delete zones;
   }
 }
 

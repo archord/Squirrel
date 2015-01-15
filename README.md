@@ -5,8 +5,8 @@ Makefile is the Netbeans IDE's default auto compile.
 Makefile1 is used for manual compile.
 
 run example
-./crossmatch -method sphere -grid 2,2 -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1
-./crossmatch -method plane  -g 2,2 -errorRadius 10 -searchRadius 30 -width 3096 -height 3096 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1
+./crossmatch -method sphere -grid 4,4 -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_25d4458_33d9878-210.Fcat -sample data/P_130112_25d4458_33d9878-119.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1
+./crossmatch -method plane  -g 4,4 -errorRadius 1.5 -searchRadius 50 -width 3096 -height 3096 -fitsHDU 3 -ref  data/P_130112_25d4458_33d9878-210.Fcat -sample data/P_130112_25d4458_33d9878-119.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1
 
 note:
 1,remember add library/astrometry.net-0.38/lib to LD_LIBRARY_PATH

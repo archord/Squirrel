@@ -24,8 +24,6 @@
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
-          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}"  -method sphere -errorRadius 0.06 -fitsHDU 3 -ref  P_130112_177d55072_60d851283-472.Fcat -sample P_130112_177d55072_60d851283-473.Fcat</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -method sphere -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -method sphere -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile database_config.txt</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -method sphere -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile data/database_config.txt</runcommandpicklistitem>
@@ -34,8 +32,10 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -method plane  -g 2*2 -errorRadius 10 -searchRadius 30 -width 3096 -height 3096 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -method sphere -grid 2*2 -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -method plane  -g 4,4 -errorRadius 1.5 -searchRadius 50 -width 3096 -height 3096 -fitsHDU 3 -ref  data/P_130112_25d4458_33d9878-210.Fcat -sample data/P_130112_25d4458_33d9878-020.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -method plane  -g 4,4 -errorRadius 1.5 -searchRadius 50 -width 3096 -height 3096 -fitsHDU 3 -ref  data/P_130112_25d4458_33d9878-210.Fcat -sample data/P_130112_25d4458_33d9878-119.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -method sphere -grid 4,4 -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_25d4458_33d9878-210.Fcat -sample data/P_130112_25d4458_33d9878-119.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}"  -method plane  -g 4,4 -errorRadius 1.5 -searchRadius 50 -width 3096 -height 3096 -fitsHDU 3 -ref  data/P_130112_25d4458_33d9878-210.Fcat -sample data/P_130112_25d4458_33d9878-020.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1</runcommand>
+        <runcommand>"${OUTPUT_PATH}"  -method sphere -grid 4,4 -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_25d4458_33d9878-210.Fcat -sample data/P_130112_25d4458_33d9878-119.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>
@@ -70,8 +70,9 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -method sphere -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1 -grid 2</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -method sphere -errorRadius 0.06 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1 -grid 2*2</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -method plane  -g 2*2 -errorRadius 10 -searchRadius 30 -width 3096 -height 3096 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -method plane  -g 4,4 -errorRadius 1.5 -searchRadius 50 -width 3096 -height 3096 -fitsHDU 3 -ref  data/P_130112_25d4458_33d9878-210.Fcat -sample data/P_130112_25d4458_33d9878-119.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}"  -method plane  -g 2*2 -errorRadius 10 -searchRadius 30 -width 3096 -height 3096 -fitsHDU 3 -ref  data/P_130112_177d55072_60d851283-472.Fcat -sample data/P_130112_177d55072_60d851283-473.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1</runcommand>
+        <runcommand>"${OUTPUT_PATH}"  -method plane  -g 4,4 -errorRadius 1.5 -searchRadius 50 -width 3096 -height 3096 -fitsHDU 3 -ref  data/P_130112_25d4458_33d9878-210.Fcat -sample data/P_130112_25d4458_33d9878-119.Fcat -dbConfigFile data/database_config.txt -fluxSDTimes 1</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>

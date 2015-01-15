@@ -25,6 +25,7 @@ CrossMatchSphere::CrossMatchSphere(const CrossMatchSphere& orig) {
 }
 
 CrossMatchSphere::~CrossMatchSphere() {
+  freeAllMemory();
 }
 
 /**
@@ -134,19 +135,18 @@ void CrossMatchSphere::freeStarList(CMStar *starList) {
 }
 
 void CrossMatchSphere::freeAllMemory() {
-/**
-    if (NULL != refStarFile)
-        refStarFile->~StarFile();
-    if (NULL != objStarFile)
-        objStarFile->~StarFile();
-    if (NULL != refStarFileNoPtn)
-        refStarFileNoPtn->~StarFile();
-    if (NULL != objStarFileNoPtn)
-        objStarFileNoPtn->~StarFile();
-    if (NULL != zones) {
-        zones->freeZoneArray();
-    }
- * */
+
+  if (NULL != refStarFile)
+    delete refStarFile;
+  if (NULL != objStarFile)
+    delete objStarFile;
+  if (NULL != refStarFileNoPtn)
+    delete refStarFileNoPtn;
+  if (NULL != objStarFileNoPtn)
+    delete objStarFileNoPtn;
+  if (NULL != zones) {
+    delete zones;
+  }
 }
 
 void CrossMatchSphere::compareResult(char *refName, char *objName, char *outfName, float errorBox) {

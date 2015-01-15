@@ -40,10 +40,10 @@ void Partition::partitonStarField(StarFile *starFile) {
   totalStar = starFile->starNum;
   CMStar *starList = starFile->starList;
 
-  if (fieldWidth == 0 || fieldHeight == 0){
+  if (fieldWidth == 0 || fieldHeight == 0) {
     getMinMaxXY(starList);
   }
-  
+
   float zoneLength = sqrt(fieldWidth * fieldHeight / totalStar);
   if (zoneLength < minZoneLength)
     zoneLength = minZoneLength;
@@ -323,9 +323,11 @@ void Partition::freeStarList(CMStar *starList) {
     CMStar *tStar = starList->next;
     while (tStar) {
       starList->next = tStar->next;
+      if (NULL != tStar->line)free(tStar->line);
       free(tStar);
       tStar = starList->next;
     }
+    if (NULL != starList->line)free(starList->line);
     free(starList);
   }
 }

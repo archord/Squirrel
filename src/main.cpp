@@ -130,6 +130,9 @@ int main(int argc, char** argv) {
   free(objFile);
   free(outFile);
   free(configFile);
+  
+  delete dataStore;
+  
   return 0;
 }
 
@@ -165,6 +168,10 @@ void mainPlane(char *refFile, char *objFile, char *outFile) {
   objStarFile->tagFluxLargeVariation();
   objStarFile->judgeInAreaPlane();
   dataStore->store(objStarFile, 0);
+  
+  delete cm;
+  delete objStarFile;
+  delete refStarFile;
 
   end = clock();
   printf("total time is: %fs\n", (end - start)*1.0 / ONESECOND);
@@ -204,6 +211,10 @@ void mainSphere(char *refFile, char *objFile, char *outFile) {
   objStarFile->tagFluxLargeVariation();
   objStarFile->wcsJudge(wcsext);
   dataStore->store(objStarFile, 0);
+  
+  delete cms;
+  delete objStarFile;
+  delete refStarFile;
 
   end = clock();
   printf("total time is: %fs\n", (end - start)*1.0 / ONESECOND);
@@ -499,6 +510,10 @@ void mainSphereTest(char *refFile, char *objFile, char *outFile) {
   printf("sphere compare\n");
   cms->compareResult(objStarFile, objnStarFile, "out_sphere.cat", areaBox);
 
+  delete objStarFile;
+  delete refStarFile;
+  delete objnStarFile;
+  delete refnStarFile;
 }
 
 void mainPlaneTest(char *refFile, char *objFile, char *outFile) {
@@ -523,5 +538,10 @@ void mainPlaneTest(char *refFile, char *objFile, char *outFile) {
   cms->matchNoPartition(refnStarFile, objnStarFile, areaBox);
   printf("plane compare\n");
   cms->compareResult(objStarFile, objnStarFile, "out_plane.cat", areaBox);
+  
+  delete objStarFile;
+  delete refStarFile;
+  delete objnStarFile;
+  delete refnStarFile;
 
 }
