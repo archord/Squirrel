@@ -236,7 +236,7 @@ void StarFileFits::readStar(char * fileName) {
       bfStar->next = tStar;
     }
     bfStar = tStar;
-    
+
     tStar->id = id[i];
     tStar->alpha = ra[i];
     tStar->delta = dec[i];
@@ -369,25 +369,15 @@ double StarFileFits::getFieldFromWCSFloat(char *fileName, int wcsext, char *fiel
   double eqin = 0.0;
   int sysout = 0;
   int wp, hp;
+  double result = 0;
 
   fits_read_tblbytes(fptr, 1, 1, naxes[0], (unsigned char*) wcsHeader, &status);
-
-  struct WorldCoor *wcs = GetFITSWCS(fileName, wcsHeader, 0, &cra, &cdec, &dra, &ddec, &secpix,
-          &wp, &hp, &sysout, &eqout);
-
-  double result = 0;
-  if (nowcs(wcs)) {
-    fprintf(stderr, "No WCS in image file %s\n", fileName);
-  } else {
-    hgetr8(wcsHeader, field, &result);
-  }
-
+  hgetr8(wcsHeader, field, &result);
 
   if (fits_close_file(fptr, &status))
     printerror(status);
 
   free(wcsHeader);
-  wcsfree(wcs);
   return result;
 }
 
