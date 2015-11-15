@@ -51,8 +51,14 @@ StoreDataPostgres::StoreDataPostgres() {
   ot_table = (char*) malloc(tlen * sizeof (char));
   sprintf(ot_table, "%s", "");
 
+  ot_record_table = (char*) malloc(tlen * sizeof (char));
+  sprintf(ot_record_table, "%s", "");
+
   ot_flux_table = (char*) malloc(tlen * sizeof (char));
   sprintf(ot_flux_table, "%s", "");
+
+  mag_diff_table = (char*) malloc(tlen * sizeof (char));
+  sprintf(mag_diff_table, "%s", "");
 
   catid = 0;
 }
@@ -62,7 +68,7 @@ StoreDataPostgres::StoreDataPostgres(const StoreDataPostgres& orig) {
 
 StoreDataPostgres::~StoreDataPostgres() {
   freeDbInfo();
-//  PQfinish(conn);
+  //  PQfinish(conn);
 }
 
 void StoreDataPostgres::store(StarFile *starFile) {
@@ -81,7 +87,11 @@ void StoreDataPostgres::store(StarFileFits *starFile, int fileType) {
   storeCatfileInfo(starFile, fileType);
   storeCatlog(starFile, fileType);
   if (!fileType) {
+    storeMagDiff(starFile);
+    matchOT(starFile);
     storeOT(starFile);
+    updateOT(starFile);
+    storeOTRecord(starFile);
     if (starFile->fluxRatioSDTimes > 0) {
       storeOTFlux(starFile);
     }
@@ -174,12 +184,24 @@ void StoreDataPostgres::readDbInfo(char *configFile) {
         strcpy(ot_table, tmpStr);
       else
         strcpy(ot_table, "");
+    } else if (strcmp(tmpStr, "ot_record_table") == 0) {
+      tmpStr = strtok(NULL, delim);
+      if (tmpStr != NULL)
+        strcpy(ot_record_table, tmpStr);
+      else
+        strcpy(ot_record_table, "");
     } else if (strcmp(tmpStr, "ot_flux_table") == 0) {
       tmpStr = strtok(NULL, delim);
       if (tmpStr != NULL)
         strcpy(ot_flux_table, tmpStr);
       else
         strcpy(ot_flux_table, "");
+    } else if (strcmp(tmpStr, "mag_diff_table") == 0) {
+      tmpStr = strtok(NULL, delim);
+      if (tmpStr != NULL)
+        strcpy(mag_diff_table, tmpStr);
+      else
+        strcpy(mag_diff_table, "");
     }
   }
   free(buf);
@@ -200,7 +222,32 @@ void StoreDataPostgres::freeDbInfo() {
   free(catfile_table);
   free(match_table);
   free(ot_table);
+  free(ot_record_table);
   free(ot_flux_table);
+  free(mag_diff_table);
+}
+
+void StoreDataPostgres::storeMagDiff(StarFileFits *starFile) {
+
+  PGresult *pgrst = NULL;
+  if (PQstatus(conn) == CONNECTION_BAD) {
+    fprintf(stderr, "connect db failed! %s\n", PQerrorMessage(conn));
+    PQfinish(conn);
+    return;
+  }
+
+  char *sqlBuf = (char*) malloc(MaxStringLength * sizeof (char));
+
+  for (int i = 0; i < starFile->gridY; i++) {
+    for (int j = 0; j < starFile->gridX; j++) {
+      int idx = i * starFile->gridX + j;
+      sprintf(sqlBuf, "insert into %s(catid,gridid,mdvalue)values(%d,%d,%lf)", mag_diff_table, catid, idx, starFile->fluxPtn[idx].magDiff);
+      pgrst = PQexec(conn, sqlBuf);
+    }
+  }
+
+  free(sqlBuf);
+  PQclear(pgrst);
 }
 
 void StoreDataPostgres::storeCatfileInfo(StarFileFits *starFile, int fileType) {
@@ -230,8 +277,8 @@ void StoreDataPostgres::storeCatfileInfo(StarFileFits *starFile, int fileType) {
     char *fileTypeStr = "true";
     if (!fileType)
       fileTypeStr = "false";
-    sprintf(sqlBuf, "insert into %s(catfile,airmass,magdiff,jd,is_ref)values('%s',%lf,%f,%lf,%s)",
-            catfile_table, starFile->fileName, starFile->airmass, starFile->magDiff, starFile->jd, fileTypeStr);
+    sprintf(sqlBuf, "insert into %s(catfile,airmass,magdiff,jd,is_ref,gridx, gridy)values('%s',%lf,%f,%lf,%s,%d,%d)",
+            catfile_table, starFile->fileName, starFile->airmass, starFile->magDiff, starFile->jd, fileTypeStr, starFile->gridX, starFile->gridY);
     pgrst = PQexec(conn, sqlBuf);
     if (PQresultStatus(pgrst) != PGRES_COMMAND_OK) {
       PQclear(pgrst);
@@ -275,6 +322,13 @@ void StoreDataPostgres::storeCatlog(StarFileFits *starFile, int fileType) {
   }
 
   char *sqlBuf = (char*) malloc(MaxStringLength * sizeof (char));
+  sprintf(sqlBuf, "select catid from %s where catfile='%s'", catfile_table, starFile->fileName);
+  pgrst = PQexec(conn, sqlBuf);
+
+  if (PQntuples(pgrst) > 0) {
+    return;
+  }
+  memset(sqlBuf, 0, MaxStringLength * sizeof (char));
   //total 22 column, not include cid 
   sprintf(sqlBuf, "COPY %s(\
             starid,crossid,catid,magnorm,ra,dec,background,classstar,ellipticity,\
@@ -315,6 +369,45 @@ void StoreDataPostgres::storeCatlog(StarFileFits *starFile, int fileType) {
   free(sqlBuf);
 }
 
+void StoreDataPostgres::matchOT(StarFileFits *starFile) {
+
+  PGresult *pgrst = NULL;
+  if (PQstatus(conn) == CONNECTION_BAD) {
+    fprintf(stderr, "connect db failed! %s\n", PQerrorMessage(conn));
+    PQfinish(conn);
+    return;
+  }
+
+  char *sqlBuf = (char*) malloc(MaxStringLength * sizeof (char));
+
+  CMStar *tStar = starFile->starList;
+  while (tStar) {
+    if ((tStar->error >= starFile->areaBox) && (tStar->inarea == 1)) {
+      sprintf(sqlBuf, "SELECT cid, sqrt(power(pixx-%f,2)+power(pixy-%f,2)) dst \
+              from %s where sqrt(power(pixx-%f,2)+power(pixy-%f,2))<%f order by dst",
+              tStar->pixx, tStar->pixy, ot_table, tStar->pixx, tStar->pixy, starFile->areaBox);
+      pgrst = PQexec(conn, sqlBuf);
+
+      if (PQresultStatus(pgrst) != PGRES_TUPLES_OK) {
+        PQclear(pgrst);
+        printf("query %s failure!\n", catfile_table);
+        printf("sql = %s\n", sqlBuf);
+        free(sqlBuf);
+        return;
+      }
+
+      int matchNum = PQntuples(pgrst);
+      if (matchNum > 0) {
+        tStar->crossid = atoi(PQgetvalue(pgrst, 0, 0));
+      }
+    }
+    tStar = tStar->next;
+  }
+
+  free(sqlBuf);
+  PQclear(pgrst);
+}
+
 void StoreDataPostgres::storeOT(StarFileFits *starFile) {
 
   PGresult *pgrst = NULL;
@@ -342,7 +435,79 @@ void StoreDataPostgres::storeOT(StarFileFits *starFile) {
     int i = 0;
     CMStar *tStar = starFile->starList;
     while (tStar) {
-      if ((tStar->error >= starFile->areaBox) && (tStar->inarea == 1)) {
+      if ((tStar->error >= starFile->areaBox) && (tStar->inarea == 1) && (tStar->crossid == 0)) {
+        starToBinaryBufOt(tStar, strBuf);
+        int copydatares = PQputCopyData(conn, strBuf->data, strBuf->cursor);
+        if (copydatares == -1) {
+          printf("copy error: %s\n", PQerrorMessage(conn));
+        }
+        strBuf->cursor = 0;
+        i++;
+      }
+      tStar = tStar->next;
+    }
+    free(strBuf);
+    free(strBuf->data);
+    PQputCopyEnd(conn, NULL);
+  } else {
+    printf("copy error: %s\n", PQerrorMessage(conn));
+  }
+  PQclear(pgrst);
+  free(sqlBuf);
+}
+
+void StoreDataPostgres::updateOT(StarFileFits *starFile) {
+
+  PGresult *pgrst = NULL;
+  if (PQstatus(conn) == CONNECTION_BAD) {
+    fprintf(stderr, "connect db failed! %s\n", PQerrorMessage(conn));
+    PQfinish(conn);
+    return;
+  }
+
+  char *sqlBuf = (char*) malloc(MaxStringLength * sizeof (char));
+  CMStar *tStar = starFile->starList;
+  while (tStar) {
+    if ((tStar->error >= starFile->areaBox) && (tStar->inarea == 1) && (tStar->crossid > 0)) {
+      sprintf(sqlBuf, "update %s set pixx=%f, pixy=%f where cid=%d",
+              ot_table, tStar->pixx, tStar->pixy, tStar->crossid);
+      PQexec(conn, sqlBuf);
+    }
+    tStar = tStar->next;
+  }
+
+  PQclear(pgrst);
+  free(sqlBuf);
+}
+
+void StoreDataPostgres::storeOTRecord(StarFileFits *starFile) {
+
+  PGresult *pgrst = NULL;
+  if (PQstatus(conn) == CONNECTION_BAD) {
+    fprintf(stderr, "connect db failed! %s\n", PQerrorMessage(conn));
+    PQfinish(conn);
+    return;
+  }
+
+  char *sqlBuf = (char*) malloc(MaxStringLength * sizeof (char));
+  //total 23 column, not include cid 
+  sprintf(sqlBuf, "COPY %s(\
+            starid,otid,catid,magnorm,ra,dec,background,classstar,ellipticity,\
+            flags,mag,mage,fwhm,pixx,pixy,thetaimage,vignet,inarea,\
+            magcalib,magcalibe,pixx1,pixy1,fluxRatio \
+            )FROM STDIN WITH BINARY", ot_record_table);
+
+  pgrst = PQexec(conn, sqlBuf);
+  if (PQresultStatus(pgrst) == PGRES_COPY_IN) {
+
+    struct strBuffer *strBuf = (struct strBuffer*) malloc(sizeof (struct strBuffer));
+    strBuf->data = (char*) malloc(LINE * sizeof (char));
+    strBuf->len = MAX_BUFFER;
+    initBinaryCopyBuf(strBuf);
+    int i = 0;
+    CMStar *tStar = starFile->starList;
+    while (tStar) {
+      if ((tStar->error >= starFile->areaBox) && (tStar->inarea == 1) && (tStar->crossid > 0)) {
         starToBinaryBufOt(tStar, strBuf);
         int copydatares = PQputCopyData(conn, strBuf->data, strBuf->cursor);
         if (copydatares == -1) {

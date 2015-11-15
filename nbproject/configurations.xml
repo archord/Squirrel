@@ -2,6 +2,7 @@
 <configurationDescriptor version="89">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles" displayName="头文件" projectFiles="true">
+      <itemPath>src/CreateTable.h</itemPath>
       <itemPath>src/CrossMatch.h</itemPath>
       <itemPath>src/CrossMatchSphere.h</itemPath>
       <itemPath>src/Partition.h</itemPath>
@@ -15,6 +16,7 @@
       <itemPath>src/libpq-fe.h</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles" displayName="源文件" projectFiles="true">
+      <itemPath>src/CreateTable.cpp</itemPath>
       <itemPath>src/CrossMatch.cpp</itemPath>
       <itemPath>src/CrossMatchSphere.cpp</itemPath>
       <itemPath>src/Partition.cpp</itemPath>
@@ -23,9 +25,13 @@
       <itemPath>src/StarFileFits.cpp</itemPath>
       <itemPath>src/StoreDataPostgres.cpp</itemPath>
       <itemPath>src/cmutils.cpp</itemPath>
+      <itemPath>src/ctable.cpp</itemPath>
       <itemPath>../Squirrel/src/main.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="资源文件" projectFiles="true">
+      <itemPath>/home/xy/program/netbeans/C/Squirrel/Makefile1</itemPath>
+      <itemPath>/home/xy/program/netbeans/C/Squirrel/README.md</itemPath>
+      <itemPath>/home/xy/program/netbeans/C/Squirrel/config/create_table_database_config.txt</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="测试文件"
@@ -59,6 +65,7 @@
           </incDir>
         </ccTool>
         <linkerTool>
+          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/squirrel</output>
           <linkerAddLib>
             <pElem>library/astrometry.net-0.38/lib</pElem>
             <pElem>library/cfitsio/lib</pElem>
@@ -68,6 +75,25 @@
         </linkerTool>
       </compileType>
       <item path="../Squirrel/src/main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="/home/xy/program/netbeans/C/Squirrel/Makefile1"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/xy/program/netbeans/C/Squirrel/README.md"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/xy/program/netbeans/C/Squirrel/config/create_table_database_config.txt"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/CreateTable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/CreateTable.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/CrossMatch.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -102,6 +128,8 @@
       <item path="src/cmhead.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/cmutils.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/ctable.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/function.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -145,6 +173,25 @@
       </compileType>
       <item path="../Squirrel/src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="/home/xy/program/netbeans/C/Squirrel/Makefile1"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/xy/program/netbeans/C/Squirrel/README.md"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/xy/program/netbeans/C/Squirrel/config/create_table_database_config.txt"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="src/CreateTable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/CreateTable.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/CrossMatch.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/CrossMatch.h" ex="false" tool="3" flavor2="0">
@@ -178,6 +225,8 @@
       <item path="src/cmhead.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/cmutils.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/ctable.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/function.h" ex="false" tool="3" flavor2="0">
       </item>

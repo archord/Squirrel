@@ -9,11 +9,13 @@ LDIR = -L ${WCSTOOL}/lib  -L ${ASTROMETRY}/lib  -L ${CFITSIO}/lib
 IDIR = -I ${WCSTOOL}/include  -I ${ASTROMETRY}/include  -I ${CFITSIO}/include -I /usr/include/postgresql
 LIBS = -lcfitsio -lm -lpq -lanutils -lpthread -lwcs -lbackend
 
-ALL:crossmatch
+ALL:crossmatch createtable
 
 crossmatch:
 	g++ ${IDIR} src/CrossMatch.cpp src/CrossMatchSphere.cpp src/Partition.cpp src/PartitionSphere.cpp src/StarFile.cpp src/StarFileFits.cpp src/StoreDataPostgres.cpp src/cmutils.cpp src/main.cpp -o crossmatch  ${LDIR} ${LIBS}
 
+createtable:
+	g++ ${IDIR} src/cmutils.cpp src/CreateTable.cpp src/ctable.cpp -o createtable ${LDIR} ${LIBS}
 clean:
-	rm -rf *.o crossmatch
+	rm -rf *.o crossmatch createtable
 

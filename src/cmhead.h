@@ -81,13 +81,15 @@ public:
 #define ERROR_GREAT_CIRCLE 0.005555555556			//(20.0/3600.0)=0.005555555556
 #define	SUBAREA	0.05555555556			//(60.0/3600.0)=0.016666666667 this value must big enough, to insure all data all find.
 #define LINE 1024
-#define MAX_BUFFER 1024
+#define MAX_BUFFER 4096
 #define ONESECOND CLOCKS_PER_SEC
 #define ANG_TO_RAD 0.017453293
 #define RAD_TO_ANG 57.295779513
 #define INDEX_SIZE 1<<20
+#define CREATE_TABLE 1
+#define DELETE_TABLE 0
 
-static const int MaxStringLength = 1024;
+static const int MaxStringLength = 4096;
 static const float CompareFloat = 0.000001;
 static const long MaxMallocMemory = 2147483648l; //1GB=1073741824l 2GB=2147483648l
 
@@ -110,6 +112,9 @@ void quickSort(int min, int max, double a[]);
 double getMedian(double array[], int len);
 double getAverage(double array[], int len);
 double getStandardDeviation(double array[], int len, double average);
+
+void getTodayDateTime(char *dateTimeStr);
+char * strReplace(char *src, const char *oldstr, const char *newstr);
 
 #endif	/* CMHEAD_H */
 

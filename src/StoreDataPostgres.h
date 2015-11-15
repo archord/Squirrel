@@ -12,55 +12,61 @@
 #include "StoreData.h"
 #include "StarFileFits.h"
 
-struct strBuffer{
-    char *data;
-    int len;
-    int cursor;
+struct strBuffer {
+  char *data;
+  int len;
+  int cursor;
 };
 
 class StoreDataPostgres : public StoreData {
 public:
 
-    PGconn *conn;
-    long catid;
+  PGconn *conn;
+  long catid;
 
-    /*database connection*/
-    char *configFile;
-    char *host;
-    char *port;
-    char *dbname;
-    char *user;
-    char *password;
-    char *options;
-    char *tty;
+  /*database connection*/
+  char *configFile;
+  char *host;
+  char *port;
+  char *dbname;
+  char *user;
+  char *password;
+  char *options;
+  char *tty;
 
-    /*table information*/
-    char *catfile_table;
-    char *match_table;
-    char *ot_table;
-    char *ot_flux_table;
+  /*table information*/
+  char *catfile_table;
+  char *match_table;
+  char *ot_table;
+  char *ot_record_table;
+  char *ot_flux_table;
+  char *mag_diff_table;
 
-    StoreDataPostgres();
-    StoreDataPostgres(const StoreDataPostgres& orig);
-    virtual ~StoreDataPostgres();
+  StoreDataPostgres();
+  StoreDataPostgres(const StoreDataPostgres& orig);
+  virtual ~StoreDataPostgres();
 
-    void readDbInfo(char *configFile);
-    void store(StarFile *starFile);
-    void store(StarFileFits *starFile, int fileType);
-    void freeDbInfo();
+  void readDbInfo(char *configFile);
+  void store(StarFile *starFile);
+  void store(StarFileFits *starFile, int fileType);
+  void freeDbInfo();
 private:
-    void storeCatfileInfo(StarFileFits *starFile, int fileType);
-    void storeCatlog(StarFileFits *starFile, int fileType);
-    void storeOT(StarFileFits *starFile);
-    void storeOTFlux(StarFileFits *starFile);
-    void addInt16(struct strBuffer* strBuf, unsigned short i);
-    void addInt32(struct strBuffer* strBuf, int i);
-    void addInt64(struct strBuffer* strBuf, long int li);
-    void addFloat4(struct strBuffer* strBuf, float f);
-    void addFloat8(struct strBuffer* strBuf, double d);
-    void initBinaryCopyBuf(struct strBuffer *strBuf);
-    void starToBinaryBuf(CMStar * tStar, int fileType, struct strBuffer *strBuf);
-    void starToBinaryBufOt(CMStar * tStar, struct strBuffer *strBuf);
+  void storeOTRecord(StarFileFits *starFile);
+  void updateOT(StarFileFits *starFile);
+  void matchOT(StarFileFits *starFile);
+  void storeMagDiff(StarFileFits *starFile);
+  void storeCatfileInfo(StarFileFits *starFile, int fileType);
+  void storeCatlog(StarFileFits *starFile, int fileType);
+  void storeOT(StarFileFits *starFile);
+  void storeOTFlux(StarFileFits *starFile);
+  void addInt16(struct strBuffer* strBuf, unsigned short i);
+  void addInt32(struct strBuffer* strBuf, int i);
+  void addInt64(struct strBuffer* strBuf, long int li);
+  void addFloat4(struct strBuffer* strBuf, float f);
+  void addFloat8(struct strBuffer* strBuf, double d);
+  void initBinaryCopyBuf(struct strBuffer *strBuf);
+  void starToBinaryBuf(CMStar * tStar, int fileType, struct strBuffer *strBuf);
+  void starToBinaryBufOt(CMStar * tStar, struct strBuffer *strBuf);
 };
 
 #endif	/* STOREDATAPOSTGRES_H */

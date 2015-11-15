@@ -423,7 +423,7 @@ void StarFileFits::getMagDiff() {
     int yIdx = (tStar->pixy - minYi) / decGridLen;
     tStar->gridIdx = yIdx * gridX + xIdx;
     if (tStar->gridIdx > gridX * gridY - 1)
-      printf("gridIdx=%d\n", tStar->gridIdx);
+      printf("error gridIdx=%d\n", tStar->gridIdx);
     if ((tStar->match != NULL) && (tStar->error < areaBox)) {
       if (tStar->mage < magErrThreshold)
         fluxPtn[tStar->gridIdx].number1++;

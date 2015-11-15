@@ -6,6 +6,34 @@
 #include <time.h>
 #include "cmhead.h"
 
+void getTodayDateTime(char *dateTimeStr){
+    time_t rawtime;
+    struct tm * timeinfo;
+    time( &rawtime );
+    timeinfo= localtime ( &rawtime ); 
+    //"%Y%m%d%I%M%S"
+    strftime (dateTimeStr,80,"%Y%m%d",timeinfo); 
+}
+
+char * strReplace(char *src, const char *oldstr, const char *newstr) {
+    char *needle;
+    char *tmp;
+    if (strlen(oldstr) == strlen(newstr) && strcmp(oldstr, newstr) == 0) {
+        return 0;
+    }
+
+    while ((needle = strstr(src, oldstr))) {// && (needle - src <= len)
+        tmp = (char*) malloc(strlen(src) + (strlen(newstr) - strlen(oldstr)) + 1);
+        strncpy(tmp, src, needle - src);
+        tmp[needle - src] = '\0';
+        strcat(tmp, newstr);
+        strcat(tmp, needle + strlen(oldstr));
+        src = strdup(tmp);
+        free(tmp);
+    }
+    return src;
+}
+
 double angToRad(double angle) {
     return angle * ANG_TO_RAD;
 }

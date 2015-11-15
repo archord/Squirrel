@@ -191,7 +191,7 @@ void mainSphere(char *refFile, char *objFile, char *outFile) {
   start = clock();
 
   int wcsext = 2;
-  float magErrThreshold = 0.05; //used by getMagDiff
+  float magErrThreshold = 0.05; //used by getMagDiffdata
 
   StarFileFits *refStarFile, *objStarFile;
   refStarFile = new StarFileFits(refFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold, gridX, gridY);
