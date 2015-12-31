@@ -7,7 +7,7 @@
 #include "CreateTable.h"
 #include "cmhead.h"
 
-int main(int argc, char** argv) {
+int main1(int argc, char** argv) {
   int flag = CREATE_TABLE;
   char *configFileName = (char *) malloc(LINE);
   char *outFileName = (char *) malloc(LINE);

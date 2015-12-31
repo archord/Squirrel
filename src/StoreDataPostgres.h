@@ -20,6 +20,8 @@ struct strBuffer {
 
 class StoreDataPostgres : public StoreData {
 public:
+  
+  int matchOTFlag;
 
   PGconn *conn;
   long catid;
@@ -59,6 +61,7 @@ private:
   void storeCatlog(StarFileFits *starFile, int fileType);
   void storeOT(StarFileFits *starFile);
   void storeOTFlux(StarFileFits *starFile);
+  void countOTOutArea(StarFileFits *starFile);
   void addInt16(struct strBuffer* strBuf, unsigned short i);
   void addInt32(struct strBuffer* strBuf, int i);
   void addInt64(struct strBuffer* strBuf, long int li);

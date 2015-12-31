@@ -61,6 +61,8 @@ StoreDataPostgres::StoreDataPostgres() {
   sprintf(mag_diff_table, "%s", "");
 
   catid = 0;
+
+  matchOTFlag = 0;
 }
 
 StoreDataPostgres::StoreDataPostgres(const StoreDataPostgres& orig) {
@@ -85,16 +87,24 @@ void StoreDataPostgres::store(StarFileFits *starFile, int fileType) {
   }
 
   storeCatfileInfo(starFile, fileType);
+  if (starFile->fileExist == 1) {
+    return;
+  }
   storeCatlog(starFile, fileType);
   if (!fileType) {
     storeMagDiff(starFile);
-    matchOT(starFile);
+    if (matchOTFlag == 1) {
+      matchOT(starFile);
+    }
     storeOT(starFile);
     updateOT(starFile);
     storeOTRecord(starFile);
     if (starFile->fluxRatioSDTimes > 0) {
       storeOTFlux(starFile);
     }
+#ifdef PRINT_CM_DETAIL
+    countOTOutArea(starFile);
+#endif
   }
 
   PQfinish(conn);
@@ -273,6 +283,7 @@ void StoreDataPostgres::storeCatfileInfo(StarFileFits *starFile, int fileType) {
 
   //if fileName not in table catfile_id, add, and get catid again
   if (PQntuples(pgrst) == 0) { //PQgetisnull
+    starFile->fileExist = 0;
     PQclear(pgrst);
     char *fileTypeStr = "true";
     if (!fileType)
@@ -299,8 +310,11 @@ void StoreDataPostgres::storeCatfileInfo(StarFileFits *starFile, int fileType) {
       free(sqlBuf);
       return;
     }
-  } else if (!fileType) {
-    printf("%s already in table %s! please check!\n", starFile->fileName, catfile_table);
+  } else {
+    starFile->fileExist = 1;
+    if (!fileType) {
+      printf("%s already in table %s! please check!\n", starFile->fileName, catfile_table);
+    }
   }
 
   catid = atoi(PQgetvalue(pgrst, 0, 0));
@@ -314,6 +328,10 @@ void StoreDataPostgres::storeCatfileInfo(StarFileFits *starFile, int fileType) {
  */
 void StoreDataPostgres::storeCatlog(StarFileFits *starFile, int fileType) {
 
+  if (starFile->fileExist == 1) {
+    return;
+  }
+
   PGresult *pgrst = NULL;
   if (PQstatus(conn) == CONNECTION_BAD) {
     fprintf(stderr, "connect db failed! %s\n", PQerrorMessage(conn));
@@ -325,9 +343,6 @@ void StoreDataPostgres::storeCatlog(StarFileFits *starFile, int fileType) {
   sprintf(sqlBuf, "select catid from %s where catfile='%s'", catfile_table, starFile->fileName);
   pgrst = PQexec(conn, sqlBuf);
 
-  if (PQntuples(pgrst) > 0) {
-    return;
-  }
   memset(sqlBuf, 0, MaxStringLength * sizeof (char));
   //total 22 column, not include cid 
   sprintf(sqlBuf, "COPY %s(\
@@ -359,6 +374,11 @@ void StoreDataPostgres::storeCatlog(StarFileFits *starFile, int fileType) {
       }
       tStar = tStar->next;
     }
+
+#ifdef PRINT_CM_DETAIL
+    printf("store crossmatch:%d\n", i);
+#endif
+
     free(strBuf);
     free(strBuf->data);
     PQputCopyEnd(conn, NULL);
@@ -390,7 +410,7 @@ void StoreDataPostgres::matchOT(StarFileFits *starFile) {
 
       if (PQresultStatus(pgrst) != PGRES_TUPLES_OK) {
         PQclear(pgrst);
-        printf("query %s failure!\n", catfile_table);
+        printf("match ot error!\n", catfile_table);
         printf("sql = %s\n", sqlBuf);
         free(sqlBuf);
         return;
@@ -446,6 +466,10 @@ void StoreDataPostgres::storeOT(StarFileFits *starFile) {
       }
       tStar = tStar->next;
     }
+
+#ifdef PRINT_CM_DETAIL
+    printf("store ot:%d\n", i);
+#endif
     free(strBuf);
     free(strBuf->data);
     PQputCopyEnd(conn, NULL);
@@ -454,6 +478,22 @@ void StoreDataPostgres::storeOT(StarFileFits *starFile) {
   }
   PQclear(pgrst);
   free(sqlBuf);
+}
+
+void StoreDataPostgres::countOTOutArea(StarFileFits *starFile) {
+
+  int i = 0;
+  CMStar *tStar = starFile->starList;
+  while (tStar) {
+    if ((tStar->error >= starFile->areaBox) && (tStar->inarea != 1)) {
+      i++;
+    }
+    tStar = tStar->next;
+  }
+
+#ifdef PRINT_CM_DETAIL
+  printf("ot out area:%d\n", i);
+#endif
 }
 
 void StoreDataPostgres::updateOT(StarFileFits *starFile) {
@@ -518,6 +558,9 @@ void StoreDataPostgres::storeOTRecord(StarFileFits *starFile) {
       }
       tStar = tStar->next;
     }
+#ifdef PRINT_CM_DETAIL
+    printf("store ot record:%d\n", i);
+#endif
     free(strBuf);
     free(strBuf->data);
     PQputCopyEnd(conn, NULL);
@@ -565,6 +608,9 @@ void StoreDataPostgres::storeOTFlux(StarFileFits *starFile) {
       }
       tStar = tStar->next;
     }
+#ifdef PRINT_CM_DETAIL
+    printf("store ot flux:%d\n", i);
+#endif
     free(strBuf);
     free(strBuf->data);
     PQputCopyEnd(conn, NULL);

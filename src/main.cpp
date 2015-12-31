@@ -35,6 +35,7 @@ void mainPlane(char *refFile, char *objFile, char *outFile);
 void mainSphereTest(char *refFile, char *objFile, char *outFile);
 void mainPlaneTest(char *refFile, char *objFile, char *outFile);
 
+int matchOT; //is match ot in database, may be need acceleration
 int showResult; //0输出所有结果，1输出匹配的结果，2输出不匹配的结果
 int printResult; //0将匹配结果不输出到终端，1输出到终端
 int showProcessInfo; //0不输出处理过程信息，1输出
@@ -70,6 +71,7 @@ void setDefaultValue() {
   gridY = 1;
   areaWidth = 0;
   areaHeight = 0;
+  matchOT =0;
 }
 
 /**
@@ -100,6 +102,8 @@ int main(int argc, char** argv) {
   if (parsePara(argc, argv) == 0) {
     return 0;
   }
+  
+  dataStore->matchOTFlag = matchOT;
 
   if (dbConfigInCommandLine == 0) {
     dataStore->readDbInfo(configFile);
@@ -357,6 +361,9 @@ int parsePara(int argc, char** argv) {
       i++;
     } else if (strcmp(argv[i], "-terminal") == 0) {
       printResult = 1;
+    } else if (strcmp(argv[i], "-matchot") == 0) {
+      matchOT = 1;
+      printf("matchOT=%d\n", matchOT);
     } else if (strcmp(argv[i], "-processInfo") == 0) {
       showProcessInfo = 1;
     } else if (strcmp(argv[i], "-g") == 0 || strcmp(argv[i], "-grid") == 0) {
@@ -419,6 +426,7 @@ void showHelp() {
   printf("                            matched:show matched stars in sample table\n");
   printf("                            unmatched:show unmatched stars in sample table\n");
   printf("-terminal:                  print result to terminal\n");
+  printf("-matchot:                  print result to terminal\n");
   printf("-cross:                     compare zone method with cross method, find the zone method omitted stars, and output to file\n");
   printf("-processInfo:               print process information\n");
   printf("-fluxSDTimes <number>:      the times of flux SD, use to filter matched star with mag\n");

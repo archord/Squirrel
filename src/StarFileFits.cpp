@@ -66,6 +66,8 @@ StarFileFits::StarFileFits(char* fileName) : StarFile(fileName) {
 
 StarFileFits::StarFileFits(char* fileName, float areaBox, int fitsHDU, int wcsext,
         int fluxRatioSDTimes, float magErrThreshold, int gridX, int gridY) {
+  
+  this->fileExist = 0;
 
   this->showProcessInfo = 0;
   this->airmass = 0.0;
@@ -274,7 +276,11 @@ void StarFileFits::readStar(char * fileName) {
     tStar->fluxVarTag = 0;
     tStar->line = NULL;
   }
-
+  
+#ifdef PRINT_CM_DETAIL
+  printf("total read star %d\n", starNum);
+#endif
+  
   free(id);
   free(ra);
   free(dec);

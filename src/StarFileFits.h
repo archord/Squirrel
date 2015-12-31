@@ -39,6 +39,9 @@ protected:
   float fieldHeight; //星表视场的高度
 
 public:
+  
+  int fileExist;
+  
   int showProcessInfo;
 
   char * fileName;
