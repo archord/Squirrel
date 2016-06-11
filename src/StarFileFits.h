@@ -72,6 +72,7 @@ public:
 
   void readStar();
   void readStar(char * fileName);
+  void writeStar(char * outFile);
   void readProerty();
   void setMagErrThreshold(float magErrThreshold);
   void setFitsHDU(int fitsHDU);

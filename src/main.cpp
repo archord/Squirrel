@@ -34,6 +34,7 @@ void mainSphere(char *refFile, char *objFile, char *outFile);
 void mainPlane(char *refFile, char *objFile, char *outFile);
 void mainSphereTest(char *refFile, char *objFile, char *outFile);
 void mainPlaneTest(char *refFile, char *objFile, char *outFile);
+void fitsToCat(char *inFile, char *outFile);
 
 int matchOT; //is match ot in database, may be need acceleration
 int showResult; //0输出所有结果，1输出匹配的结果，2输出不匹配的结果
@@ -71,7 +72,7 @@ void setDefaultValue() {
   gridY = 1;
   areaWidth = 0;
   areaHeight = 0;
-  matchOT =0;
+  matchOT = 0;
 }
 
 /**
@@ -85,7 +86,7 @@ int main(int argc, char** argv) {
   }
 
   setDefaultValue();
-  
+
   cmdDbInfo = (char*) malloc(LINE);
   memset(cmdDbInfo, 0, LINE);
   refFile = (char*) malloc(LINE);
@@ -102,7 +103,7 @@ int main(int argc, char** argv) {
   if (parsePara(argc, argv) == 0) {
     return 0;
   }
-  
+
   dataStore->matchOTFlag = matchOT;
 
   if (dbConfigInCommandLine == 0) {
@@ -110,7 +111,7 @@ int main(int argc, char** argv) {
   } else {
     getDBInfo(cmdDbInfo, dataStore);
   }
-
+  
   if (method == PLANE_METHOD) {
     if (areaWidth == 0 || areaHeight == 0) {
       printf("in plane coordinate mode, must assign \"-width\" and \"-height\"\n");
@@ -134,10 +135,20 @@ int main(int argc, char** argv) {
   free(objFile);
   free(outFile);
   free(configFile);
-  
+
   delete dataStore;
-  
+
   return 0;
+}
+
+void fitsToCat(char *inFile, char *outFile) {
+  int wcsext = 2;
+  float magErrThreshold = 0.05; //used by getMagDiff
+
+  StarFileFits *refStarFile;
+  refStarFile = new StarFileFits(inFile, areaBox, fitsHDU, wcsext, fluxRatioSDTimes, magErrThreshold, gridX, gridY);
+  refStarFile->readStar();
+  refStarFile->writeStar(outFile);
 }
 
 void mainPlane(char *refFile, char *objFile, char *outFile) {
@@ -172,7 +183,7 @@ void mainPlane(char *refFile, char *objFile, char *outFile) {
   objStarFile->tagFluxLargeVariation();
   objStarFile->judgeInAreaPlane();
   dataStore->store(objStarFile, 0);
-  
+
   delete cm;
   delete objStarFile;
   delete refStarFile;
@@ -215,7 +226,7 @@ void mainSphere(char *refFile, char *objFile, char *outFile) {
   objStarFile->tagFluxLargeVariation();
   objStarFile->wcsJudge(wcsext);
   dataStore->store(objStarFile, 0);
-  
+
   delete cms;
   delete objStarFile;
   delete refStarFile;
@@ -363,7 +374,7 @@ int parsePara(int argc, char** argv) {
       printResult = 1;
     } else if (strcmp(argv[i], "-matchot") == 0) {
       matchOT = 1;
-      printf("matchOT=%d\n", matchOT);
+      //printf("matchOT=%d\n", matchOT);
     } else if (strcmp(argv[i], "-processInfo") == 0) {
       showProcessInfo = 1;
     } else if (strcmp(argv[i], "-g") == 0 || strcmp(argv[i], "-grid") == 0) {
@@ -426,7 +437,7 @@ void showHelp() {
   printf("                            matched:show matched stars in sample table\n");
   printf("                            unmatched:show unmatched stars in sample table\n");
   printf("-terminal:                  print result to terminal\n");
-  printf("-matchot:                  print result to terminal\n");
+  printf("-matchot:                   when save ot, whether match new ot with history ot\n");
   printf("-cross:                     compare zone method with cross method, find the zone method omitted stars, and output to file\n");
   printf("-processInfo:               print process information\n");
   printf("-fluxSDTimes <number>:      the times of flux SD, use to filter matched star with mag\n");
@@ -546,7 +557,7 @@ void mainPlaneTest(char *refFile, char *objFile, char *outFile) {
   cms->matchNoPartition(refnStarFile, objnStarFile, areaBox);
   printf("plane compare\n");
   cms->compareResult(objStarFile, objnStarFile, "out_plane.cat", areaBox);
-  
+
   delete objStarFile;
   delete refStarFile;
   delete objnStarFile;

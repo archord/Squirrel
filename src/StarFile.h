@@ -25,7 +25,7 @@ public:
 
     virtual void readStar();
     virtual void readStar(char * fileName);
-    void writeStar(char * outFile);
+    virtual void writeStar(char * outFile);
 
 private:
 };

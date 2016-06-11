@@ -7,7 +7,7 @@ POSTGRESQL = /usr/include/postgresql
 #POSTGRESQL = /home/optdata/opt2/DB
 
 LDIR = -L ${WCSTOOL}/lib  -L ${ASTROMETRY}/lib  -L ${CFITSIO}/lib -L ${POSTGRESQL}/lib
-IDIR = -I ${WCSTOOL}/include  -I ${ASTROMETRY}/include  -I ${CFITSIO}/include -I ${POSTGRESQL}/include
+IDIR = -I ${WCSTOOL}/include  -I ${ASTROMETRY}/include  -I ${CFITSIO}/include -I ${POSTGRESQL}
 LIBS = -lcfitsio -lm -lpq -lanutils -lpthread -lwcs -lbackend
 
 ALL:crossmatch createtable

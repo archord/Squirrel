@@ -66,7 +66,7 @@ StarFileFits::StarFileFits(char* fileName) : StarFile(fileName) {
 
 StarFileFits::StarFileFits(char* fileName, float areaBox, int fitsHDU, int wcsext,
         int fluxRatioSDTimes, float magErrThreshold, int gridX, int gridY) {
-  
+
   this->fileExist = 0;
 
   this->showProcessInfo = 0;
@@ -276,11 +276,11 @@ void StarFileFits::readStar(char * fileName) {
     tStar->fluxVarTag = 0;
     tStar->line = NULL;
   }
-  
+
 #ifdef PRINT_CM_DETAIL
   printf("total read star %d\n", starNum);
 #endif
-  
+
   free(id);
   free(ra);
   free(dec);
@@ -739,4 +739,22 @@ void StarFileFits::setFieldHeight(float fieldHeight) {
 
 void StarFileFits::setFieldWidth(float fieldWidth) {
   this->fieldWidth = fieldWidth;
+}
+
+void StarFileFits::writeStar(char * outFile) {
+
+  FILE *fp = fopen(outFile, "w");
+  fprintf(fp, "starId\tra\tdec\tx\ty\tx1\ty1\tmag\tmage\n");
+
+  long count = 0;
+  CMStar *tStar = starList;
+  while (NULL != tStar) {
+    fprintf(fp, "%8d %12f %12f %12f %12f %12f %12f %12f %12f\n",
+            tStar->id, tStar->alpha, tStar->delta, tStar->pixx, tStar->pixy,
+            tStar->pixx1, tStar->pixy1, tStar->mag, tStar->mage);
+    count++;
+    tStar = tStar->next;
+  }
+  printf("total write %d stars\n", count);
+  fclose(fp);
 }
