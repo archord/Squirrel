@@ -391,13 +391,22 @@ void StarFileFits::getMagDiff() {
 
   if (starList == NULL) return;
 
-  fluxPtn = (FluxPartition*) malloc(sizeof (FluxPartition) * gridX * gridY);
-  memset(fluxPtn, 0, sizeof (FluxPartition) * gridX * gridY);
+  int gridNUmber = gridX * gridY;
+  fluxPtn = (FluxPartition*) malloc(sizeof (FluxPartition) * gridNUmber);
+  memset(fluxPtn, 0, sizeof (FluxPartition) * gridNUmber);
+
   float minXf = 360.0;
   float maxXf = 0.0;
   float minYf = 90.0;
   float maxYf = -90.0;
+
   CMStar *tStar = starList;
+  minXf = tStar->pixx;
+  maxXf = tStar->pixx;
+  minYf = tStar->pixy;
+  maxYf = tStar->pixy;
+  tStar = tStar->next;
+
   while (tStar) {
     if (tStar->pixx < minXf) {
       minXf = tStar->pixx;
@@ -419,22 +428,34 @@ void StarFileFits::getMagDiff() {
   int minYi = floor(minYf);
   int maxYi = ceil(maxYf);
 
-  float raGridLen = (maxXi - minXi) *1.0 / gridX;
-  float decGridLen = (maxYi - minYi) *1.0 / gridY;
+  float xGridLen = (maxXi - minXi) *1.0 / gridX;
+  float yGridLen = (maxYi - minYi) *1.0 / gridY;
 
   tStar = starList;
   //统计每个分区中星的个数
+
   while (tStar) {
-    int xIdx = (tStar->pixx - minXi) / raGridLen;
-    int yIdx = (tStar->pixy - minYi) / decGridLen;
+    int xIdx = (tStar->pixx - minXi) / xGridLen;
+    int yIdx = (tStar->pixy - minYi) / yGridLen;
     tStar->gridIdx = yIdx * gridX + xIdx;
-    if (tStar->gridIdx > gridX * gridY - 1)
-      printf("error gridIdx=%d\n", tStar->gridIdx);
+
+    if (tStar->gridIdx > gridNUmber - 1) {
+      printf("error: point(%f,%f) gridIdx=%d, bigger then maxGridIDx=%d, minx=%f, miny=%f, maxx=%f, maxy=%f\n",
+              tStar->pixx, tStar->pixy, tStar->gridIdx, gridNUmber - 1, minXf, minYf, maxXf, maxYf);
+    }
+
+    if (tStar->gridIdx < 0) {
+      tStar->gridIdx = 0;
+    } else if (tStar->gridIdx > gridNUmber - 1) {
+      tStar->gridIdx = gridNUmber - 1;
+    }
+
     if ((tStar->match != NULL) && (tStar->error < areaBox)) {
       if (tStar->mage < magErrThreshold)
         fluxPtn[tStar->gridIdx].number1++;
       fluxPtn[tStar->gridIdx].number2++;
     }
+
     tStar = tStar->next;
   }
 
