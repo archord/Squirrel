@@ -437,6 +437,10 @@ void StarFileFits::getMagDiff() {
   while (tStar) {
     int xIdx = (tStar->pixx - minXi) / xGridLen;
     int yIdx = (tStar->pixy - minYi) / yGridLen;
+
+    if (xIdx >= gridX) xIdx = gridX;
+    if (yIdx >= gridY) yIdx = gridY;
+
     tStar->gridIdx = yIdx * gridX + xIdx;
 
     if (tStar->gridIdx > gridNUmber - 1) {
