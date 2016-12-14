@@ -1,0 +1,9 @@
+# !/bin/bash 
+for ((i = 0 ;i < 5 ;i ++ )); do 
+{
+    Debug/Squirrel -times 100 -redisHost 192.168.0.90:7001 -method plane -grid 4,4 -errorRadius 1.5 -searchRadius 50 -fitsHDU 3 -ref  data/RA240_DEC10_sqd225-ccd17-0001.cat  -sample data/RA240_DEC10_sqd225-ccd17-0002.cat  -dbConfigFile config/database_config.txt -width 3016 -height 3016 -show all -terminal -output data/output 
+} & 
+done
+wait 
+cat aa | wc  - l
+rm aa
