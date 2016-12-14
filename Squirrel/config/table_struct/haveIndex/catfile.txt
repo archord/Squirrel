@@ -1,0 +1,10 @@
+(
+catid          bigserial PRIMARY KEY,
+catfile        varchar(255),
+airmass        double precision,
+magdiff        double precision,  
+jd             double precision,
+IS_REF         bool, 
+gridx 	       integer,
+gridy          integer
+);

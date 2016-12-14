@@ -1,0 +1,9 @@
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1811335523/CLASSPATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1811335523/CLASSPATH/operation=replace
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1811335523/CLASSPATH/value=.\:/usr/lib/jvm/jdk1.8.0_45/lib\#\:/home/wamdm/wengzujian/astroDB/alluxio-1.0.1/core/client/target/alluxio-core-client-1.0.1-jar-with-dependencies.jar
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1811335523/LD_LIBRARY_PATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1811335523/LD_LIBRARY_PATH/operation=append
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1811335523/LD_LIBRARY_PATH/value=\:/usr/lib/jvm/jdk1.8.0_45/jre/lib/amd64/server
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1811335523/append=true
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1811335523/appendContributed=true

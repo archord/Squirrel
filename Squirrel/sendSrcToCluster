@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for(( worker = 72; worker < 78; worker++)) 
+do
+	scp -r ~/workspace/Squirrel/cross_src 192.168.0.$worker:~/workspace/Squirrel
+done
