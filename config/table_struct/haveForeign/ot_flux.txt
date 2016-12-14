@@ -1,0 +1,31 @@
+(
+cid            bigserial PRIMARY KEY,
+starid          bigint,
+crossid         bigint,
+ra             double precision,
+dec            double precision,
+catid           bigint  REFERENCES catfile_table(catid) ON UPDATE CASCADE,
+background     double precision,
+classstar        double precision,
+ellipticity       double precision,
+flags           double precision,
+mag           double precision,
+mage          double precision,
+magnorm       double precision,
+fwhm          double precision,
+magcalib       double precision,
+magcalibe      double precision,
+pixx           double precision,
+pixy           double precision,
+inarea         int,
+thetaimage    double precision,
+vignet        double precision,
+pixx1           double precision,
+pixy1           double precision,
+fluxratio	double precision
+);
+CREATE INDEX ot_flux_table_otid_index on ot_flux_table(crossid);
+ANALYZE ot_flux_table;
+CREATE INDEX ot_flux_table_catid_index on ot_flux_table(catid);
+ANALYZE ot_flux_table;
+
