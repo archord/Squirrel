@@ -178,6 +178,14 @@ void Partition::getMinMaxXY(CMStar *starList) {
     nextStar = nextStar->next;
   }
 
+  maxx = maxx + 1;
+  maxy = maxy + 1;
+  minx = minx - 1;
+  miny = miny - 1;
+
+  minx = minx < 0 ? 0 : minx;
+  miny = miny < 0 ? 0 : miny;
+
   fieldWidth = maxx - minx;
   fieldHeight = maxy - miny;
 }
