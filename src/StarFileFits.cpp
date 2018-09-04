@@ -783,6 +783,26 @@ void StarFileFits::writeStar(char * outFile) {
     count++;
     tStar = tStar->next;
   }
-  printf("total write %d stars\n", count);
+  printf("total write %ld stars\n", count);
+  fclose(fp);
+}
+
+void StarFileFits::writeMatchStar(char * outFile) {
+
+  FILE *fp = fopen(outFile, "w");
+  fprintf(fp, "objId\tobjX\tobjY\ttmpId\ttmpX\ttmpY\terror\n");
+
+  long count = 0;
+  CMStar *tStar = starList;
+  while (NULL != tStar) {
+    if (NULL != tStar->match && tStar->error < this->areaBox & tStar->error>1.5) {
+    fprintf(fp, "%8d %12f %12f %8d %12f %12f %12f\n",
+            tStar->id, tStar->pixx, tStar->pixy,
+            tStar->match->id, tStar->match->pixx, tStar->match->pixy, tStar->error);
+    count++;
+    }
+    tStar = tStar->next;
+  }
+  printf("total write %ld stars\n", count);
   fclose(fp);
 }
