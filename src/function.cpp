@@ -1345,7 +1345,7 @@ float getMagDiff(struct SAMPLE *sample) {
     int i = 0, j = 0;
     while (tSample) {
         if ((tSample->reference != NULL) && (tSample->error < areaBox)) {
-            tSample->fluxRatio = pow10(-0.4 * (tSample->reference->mag - tSample->mag));
+            tSample->fluxRatio = pow(10, -0.4 * (tSample->reference->mag - tSample->mag));
             samplesArray[j++] = tSample->fluxRatio;
             if ((tSample->mage < 0.05)) {
                 magDiffs[i++] = tSample->fluxRatio;

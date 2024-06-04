@@ -479,7 +479,7 @@ void StarFileFits::getMagDiff() {
   //对分区数组赋值
   while (tStar) {
     if ((tStar->match != NULL) && (tStar->error < areaBox)) {
-      tStar->fluxRatio = pow10(-0.4 * (tStar->match->mag - tStar->mag));
+      tStar->fluxRatio = pow(10, -0.4 * (tStar->match->mag - tStar->mag));
       if (tStar->mage < magErrThreshold)
         fluxPtn[tStar->gridIdx].fluxRatios1[fluxPtn[tStar->gridIdx].curIdx1++] = tStar->fluxRatio;
       fluxPtn[tStar->gridIdx].fluxRatios2[fluxPtn[tStar->gridIdx].curIdx2++] = tStar->fluxRatio;
