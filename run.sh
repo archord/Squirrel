@@ -1,3 +1,4 @@
+cp library_src/wcstools-3.9.7/libwcs/*.a library/wcstools-3.8.5/lib/
 make clean -f Makefile2
 make -f Makefile2
 ./createtable -d 20160402
