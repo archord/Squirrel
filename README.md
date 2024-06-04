@@ -9,9 +9,9 @@ sh run.sh
 
 ## 安装postgres的C语言开发包
 
-apt-get install libpq-dev
+apt-get install libpq-dev -y 
  
-apt install postgresql
+apt install postgresql -y 
 
 ## cfitsio
 
