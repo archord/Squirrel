@@ -1,8 +1,8 @@
 host=localhost
 port=5432
-dbname=gwac2
-user=xy
-password=xyag902
+dbname=postgres
+user=postgres
+password=123456
 
 catfile_table_prefix=catfile_
 match_table_prefix=crossmatch_
