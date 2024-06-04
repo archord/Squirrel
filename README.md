@@ -6,6 +6,7 @@ Squirrel
 ## cfitsio
 
 在astrometry.net的安装依赖中会安装这个包：libcfitsio-dev
+export LD_LIBRARY_PATH=/home/disk1/opt/svomproc/gwacdblc/gwacdblc/Squirrel/library/lib:${LD_LIBRARY_PATH}
 
 ## wcstools 
 
