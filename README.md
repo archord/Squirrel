@@ -16,6 +16,7 @@ make -j 2
 make install
 
 include和lib在libwcs中
+cp library_src/wcstools-3.9.7/libwcs/*.a library/wcstools-3.8.5/lib/
 
 
 

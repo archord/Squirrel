@@ -379,8 +379,8 @@ void StoreDataPostgres::storeCatlog(StarFileFits *starFile, int fileType) {
     printf("store crossmatch:%d\n", i);
 #endif
 
-    free(strBuf);
     free(strBuf->data);
+    free(strBuf);
     PQputCopyEnd(conn, NULL);
   } else {
     printf("copy error: %s\n", PQerrorMessage(conn));
@@ -470,8 +470,8 @@ void StoreDataPostgres::storeOT(StarFileFits *starFile) {
 #ifdef PRINT_CM_DETAIL
     printf("store ot:%d\n", i);
 #endif
-    free(strBuf);
     free(strBuf->data);
+    free(strBuf);
     PQputCopyEnd(conn, NULL);
   } else {
     printf("copy error: %s\n", PQerrorMessage(conn));
@@ -561,8 +561,8 @@ void StoreDataPostgres::storeOTRecord(StarFileFits *starFile) {
 #ifdef PRINT_CM_DETAIL
     printf("store ot record:%d\n", i);
 #endif
-    free(strBuf);
     free(strBuf->data);
+    free(strBuf);
     PQputCopyEnd(conn, NULL);
   } else {
     printf("copy error: %s\n", PQerrorMessage(conn));
@@ -611,8 +611,8 @@ void StoreDataPostgres::storeOTFlux(StarFileFits *starFile) {
 #ifdef PRINT_CM_DETAIL
     printf("store ot flux:%d\n", i);
 #endif
-    free(strBuf);
     free(strBuf->data);
+    free(strBuf);
     PQputCopyEnd(conn, NULL);
   } else {
     printf("copy error: %s\n", PQerrorMessage(conn));
