@@ -1,6 +1,34 @@
 Squirrel
 ========
 
+# install library: 
+
+## cfitsio
+
+在astrometry.net的安装依赖中会安装这个包：libcfitsio-dev
+
+## wcstools 
+
+在astrometry.net的安装依赖中会安装这个包：wcslib-dev，不再默认路径中，需要手动安装
+
+make -j 2
+
+make install
+
+include和lib在libwcs中
+
+
+
+## astrometry.net
+
+sudo apt install build-essential curl git file pkg-config swig \
+       libcairo2-dev libnetpbm10-dev netpbm libpng-dev libjpeg-dev \
+       zlib1g-dev libbz2-dev libcfitsio-dev wcslib-dev \
+       python3 python3-pip python3-dev \
+       python3-numpy python3-scipy python3-pil
+
+
+# compile
 Makefile is the Netbeans IDE's default auto compile.
 Makefile1 is used for manual compile.
 
