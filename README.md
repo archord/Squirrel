@@ -32,4 +32,4 @@ netbeans run command
 for crassmatch
 "${OUTPUT_PATH}"  -method plane -grid 4,4 -errorRadius 1.5 -searchRadius 50 -fitsHDU 3 -ref  data/ref.Fcat -sample data/M3_05_141025_1_074020_0873.Fcat -dbConfigFile config/database_config.txt -width 3016 -height 3016
 for createtable
-"${OUTPUT_PATH}" -c 20151111
+"${OUTPUT_PATH}" -c 20160402
