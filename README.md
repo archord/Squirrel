@@ -1,6 +1,10 @@
 Squirrel
 ========
 
+项目的依赖库library在Ubuntu 22.04上进行编译,在Ubuntu 22.04上一键编译并测试createtable和crossmatch程序
+
+sh run.sh
+
 # install library: 
 
 ## 安装postgres的C语言开发包
