@@ -10,6 +10,8 @@ sh run.sh
 ## 安装postgres的C语言开发包
 
 apt-get install libpq-dev
+ 
+apt install postgresql
 
 ## cfitsio
 
@@ -44,6 +46,8 @@ sudo apt install build-essential curl git file pkg-config swig \
 astrometry.net-0.95编译安装完成后，在编译crossmatch是发现头文件有问题，使用astrometry.net-0.38的头文件可以解决，这里后续也需要优化。
 
 libbackend是astrometry.net-0.38/lib中的一个库
+
+apt install astrometry.net #是否安装了开发包？
 
 # compile
 Makefile is the Netbeans IDE's default auto compile.
