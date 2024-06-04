@@ -1,4 +1,4 @@
-export LD_LIBRARY_PATH=library/lib:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=library/cfitsio/lib/:${LD_LIBRARY_PATH}
 #cp library_src/wcstools-3.9.7/libwcs/*.a library/wcstools-3.8.5/lib/
 make clean -f Makefile
 make -f Makefile
