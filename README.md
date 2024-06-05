@@ -1,9 +1,12 @@
 Squirrel
 ========
 
-项目的依赖库library在Ubuntu 22.04上进行编译,在Ubuntu 22.04上一键编译并测试createtable和crossmatch程序
+项目的依赖库library在Ubuntu 22.04上进行编译， 在Ubuntu 22.04上可以一键编译并测试createtable和crossmatch程序
 
-sh run.sh
+在Ubuntu 22.04上只需执行以下3步：
+1. apt update & apt-get install libpq-dev libcfitsio-dev -y 
+2. 修改config/create_table_database_config.txt中的数据库配置：host，port，dbname，user，password
+3. sh run.sh
 
 # install library: 
 
@@ -12,6 +15,12 @@ sh run.sh
 apt-get install libpq-dev -y 
  
 apt install postgresql -y 
+
+psql -U postgres -d postgres -h localhost -W
+-W` 选项会提示你输入密码。
+ALTER USER postgres WITH PASSWORD '123456';
+
+ select count(*) from ot_20160402;
 
 ## cfitsio
 
@@ -82,3 +91,15 @@ RHEL: /usr/include/postgresql/libpq-fe.h
 3,library path
 Ubuntu: /usr/lib/postgresql/9.3/
 RHEL: /usr/include/postgresql
+
+
+# error
+
+ERROR: Mismatch in the CFITSIO_SONAME value in the fitsio.h include file
+that was used to build the CFITSIO library, and the value in the include file
+that was used when compiling the application program:
+   Version used to build the CFITSIO library   = 10
+   Version included by the application program = 871916264
+
+Fix this by recompiling and then relinking this application program 
+with the CFITSIO library

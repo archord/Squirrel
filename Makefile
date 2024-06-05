@@ -6,8 +6,8 @@ CFITSIO = ${PERFIX}/cfitsio
 POSTGRESQL = /usr/include/postgresql
 #POSTGRESQL = /home/optdata/opt2/DB
 
-LDIR = -L ${WCSTOOL}/lib  -L ${ASTROMETRY}/lib  -L ${CFITSIO}/lib -L ${POSTGRESQL}/lib
-IDIR = -I ${WCSTOOL}/include  -I ${ASTROMETRY}/include  -I ${CFITSIO}/include -I ${POSTGRESQL}
+LDIR = -L ${ASTROMETRY}/lib -L ${POSTGRESQL}/lib -L ${WCSTOOL}/lib
+IDIR =  -I ${ASTROMETRY}/include -I ${POSTGRESQL}  -I ${WCSTOOL}/include
 LIBS = -lcfitsio -lm -lpq -lanutils -lpthread -lwcs -lbackend
 
 ALL:crossmatch createtable
