@@ -96,6 +96,8 @@ RHEL: /usr/include/postgresql
 
 # error
 
+使用library_src/cfitsio-4.4.0.tar.gz编译的cfitsio，运行crossmatch会报如下错误，或许这个包有问题，这个包和astrometry.net-0.95.tar.gz都来源于github，或许不是稳定版。
+
 ERROR: Mismatch in the CFITSIO_SONAME value in the fitsio.h include file
 that was used to build the CFITSIO library, and the value in the include file
 that was used when compiling the application program:
