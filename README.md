@@ -1,7 +1,8 @@
 Squirrel
 ========
 
-项目的依赖库library在Ubuntu 22.04上进行编译， 在Ubuntu 22.04上可以一键编译并测试createtable和crossmatch程序
+项目仅依赖cfitsio、wcstools、astrometry.net，手动在Makefile完成配置后即可编译项目。
+library目录包含这三个库在Ubuntu 22.04上的编译文件， 在Ubuntu 22.04上可以一键编译并测试createtable和crossmatch程序
 
 在Ubuntu 22.04上只需执行以下3步：
 1. apt update & apt-get install libpq-dev libcfitsio-dev -y 
